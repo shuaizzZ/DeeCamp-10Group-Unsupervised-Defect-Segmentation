@@ -21,7 +21,7 @@ Then compare the features of each pixel of x and y, where the feature difference
 the defect.
 
 # Architecture
-![architecture](https://github.com/shuaizzZ/DeeCamp-10Group-Unsupervised-Defect-Segmentation/master/architecture.jpg)
+![architecture](https://github.com/shuaizzZ/DeeCamp-10Group-Unsupervised-Defect-Segmentation/blob/master/architecture.jpg)
 
 # Directory 
 - config: This repo includes configuration file for training and evaluation. The parameters are saved in `.jason` file.
