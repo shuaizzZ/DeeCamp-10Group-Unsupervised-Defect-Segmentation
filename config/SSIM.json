@@ -1,0 +1,35 @@
+{
+    "model": {
+        "name": "SSIM_Net",
+        "code_dim": 256,
+        "fp16": false
+    },
+    "op": {
+        "loss": "SSIM_loss",
+        "window_size":11,
+
+        "start_epoch": 0,
+        "max_epoch": 24,
+        "snapshot": 4,
+        "learning_rate": 4e-3,
+        "decay_rate": 10,
+        "epoch_steps": [20, 24]
+    },
+    "db": {
+        "name": "mvtec",
+        "data_dir": "D:/DataSet/mvtec_anomaly_detection",
+        "loader_threads": 4,
+        "train_split": "train",
+        "val_split": "test",
+        "resize": [256, 256],
+        "crop_size": [128, 128],
+        "batch_size": 2
+    },
+    "system": {
+        "resume": false,
+        "resume_path": "",
+        "finetune": false,
+        "finetune_path": "",
+        "save_dir": "./weights/"
+    }
+}
