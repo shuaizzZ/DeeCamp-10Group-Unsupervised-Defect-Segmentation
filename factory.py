@@ -12,3 +12,13 @@ def load_training_model_from_factory(configs):
         raise Exception("Invalid model name")
 
     return net, loss, optimizer
+
+
+def load_test_model_from_factory(configs):
+    if configs['model']['name'] == 'SSIM_Net':
+        from model.networks import SSIM_Net
+        net = SSIM_Net(code_dim=configs['model']['code_dim'])
+    else:
+        raise Exception("Invalid model name")
+
+    return net

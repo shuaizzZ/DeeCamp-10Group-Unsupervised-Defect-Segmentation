@@ -17,7 +17,7 @@
     },
     "db": {
         "name": "mvtec",
-        "data_dir": "/data/data/mvtec_anomaly_detection",
+        "data_dir": "D:/DataSet/mvtec_anomaly_detection",
         "loader_threads": 2,
         "train_split": "train",
         "val_split": "test",

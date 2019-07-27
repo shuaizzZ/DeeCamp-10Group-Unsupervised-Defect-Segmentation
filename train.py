@@ -3,8 +3,8 @@ import json
 import argparse
 from db import MVTEC, MVTEC_pre, training_collate
 from model.trainer import Trainer
-from factory import *
 from tools import Timer, Log
+from factory import *
 
 
 def parse_args():

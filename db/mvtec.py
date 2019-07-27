@@ -61,7 +61,11 @@ class MVTEC(data.Dataset):
                 for img in os.listdir(img_dir):
                     self.ids.append(os.path.join(img_dir, img))
             elif set == 'test':
-                pass
+                type_dir = os.path.join(item_path, set)
+                for type in os.listdir(type_dir):
+                    img_dir = os.path.join(item_path, set, type)
+                    for img in os.listdir(img_dir):
+                        self.ids.append(os.path.join(img_dir, img))
             else:
                 raise Exception("Invalid set name")
 
@@ -82,7 +86,8 @@ class MVTEC(data.Dataset):
     def pull_image(self, index):
         """Returns test image
         """
-        pass
+        path = self.ids[index]
+        return cv2.imread(path)
 
     def pull_gt(self, index):
         """Returns gt of test image
