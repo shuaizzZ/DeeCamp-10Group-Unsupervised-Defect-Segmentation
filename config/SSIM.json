@@ -9,21 +9,21 @@
         "window_size":11,
 
         "start_epoch": 0,
-        "max_epoch": 24,
-        "snapshot": 4,
+        "max_epoch": 200,
+        "snapshot": 10,
         "learning_rate": 4e-3,
         "decay_rate": 10,
-        "epoch_steps": [20, 24]
+        "epoch_steps": [80, 160]
     },
     "db": {
         "name": "mvtec",
-        "data_dir": "D:/DataSet/mvtec_anomaly_detection",
-        "loader_threads": 4,
+        "data_dir": "/data/data/mvtec_anomaly_detection",
+        "loader_threads": 2,
         "train_split": "train",
         "val_split": "test",
         "resize": [256, 256],
         "crop_size": [128, 128],
-        "batch_size": 2
+        "batch_size": 64
     },
     "system": {
         "resume": false,

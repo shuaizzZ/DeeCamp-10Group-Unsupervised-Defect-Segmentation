@@ -32,7 +32,7 @@ class Preproc(object):
 
         # image normal
         tile = tile.astype(np.float32) / 255.
-        normalize_(tile, self.mean, self.std)
+        # normalize_(tile, self.mean, self.std)
         tile = tile.transpose((2, 0, 1))
 
         return torch.from_numpy(tile)
