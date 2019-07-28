@@ -3,8 +3,8 @@ import json
 import argparse
 from db import MVTEC, MVTEC_pre, training_collate
 from model.trainer import Trainer
-from factory import *
 from tools import Timer, Log
+from factory import *
 
 
 def parse_args():
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # load data set
     mvtec = MVTEC(root=configs['db']['data_dir'], set=configs['db']['train_split'],
-                  preproc=MVTEC_pre(resize=tuple(configs['db']['resize']), crop_size=tuple(configs['db']['crop_size'])))
+                  preproc=MVTEC_pre(resize=tuple(configs['db']['resize'])))
     print('Data set: {} has been loaded'.format(configs['db']['name']))
 
     # load model
@@ -110,6 +110,9 @@ if __name__ == '__main__':
             mes += '|| Batch time: %.4f sec.' % batch_time
             log.wr_mes(mes)
             print(mes)
+    save_name = '{}-final.pth'.format(args.cfg)
+    save_path = os.path.join(save_dir, save_name)
+    trainer.save_params(save_path)
     log.close()
     exit(0)
 

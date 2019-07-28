@@ -17,25 +17,23 @@ class Preproc(object):
         resize: tup(int width, int height): resize shape
         crop: tup(int width, int height): crop shape
     """
-    def __init__(self, resize, crop_size):
+    def __init__(self, resize):
         self.resize = resize
-        self.crop_size = crop_size
-        self.mean = np.array([0.40789654, 0.44719302, 0.47026115], dtype=np.float32)
-        self.std = np.array([0.28863828, 0.27408164, 0.27809835], dtype=np.float32)
+        # self.crop_size = crop_size
 
     def __call__(self, image):
         image = cv2.resize(image, self.resize)
-        tile = crop(image, crop_size=self.crop_size)
+        # image = crop(image, crop_size=self.crop_size)
         p = np.random.uniform(0, 1)
         if p > 0.5:
-            tile = mirror(tile)
+            image = mirror(image)
 
         # image normal
-        tile = tile.astype(np.float32) / 255.
-        normalize_(tile, self.mean, self.std)
-        tile = tile.transpose((2, 0, 1))
+        image = image.astype(np.float32) / 255.
+        # normalize_(tile, self.mean, self.std)
+        image = image.transpose((2, 0, 1))
 
-        return torch.from_numpy(tile)
+        return torch.from_numpy(image)
 
 
 class MVTEC(data.Dataset):
@@ -61,7 +59,11 @@ class MVTEC(data.Dataset):
                 for img in os.listdir(img_dir):
                     self.ids.append(os.path.join(img_dir, img))
             elif set == 'test':
-                pass
+                type_dir = os.path.join(item_path, set)
+                for type in os.listdir(type_dir):
+                    img_dir = os.path.join(item_path, set, type)
+                    for img in os.listdir(img_dir):
+                        self.ids.append(os.path.join(img_dir, img))
             else:
                 raise Exception("Invalid set name")
 
@@ -82,7 +84,8 @@ class MVTEC(data.Dataset):
     def pull_image(self, index):
         """Returns test image
         """
-        pass
+        path = self.ids[index]
+        return cv2.imread(path)
 
     def pull_gt(self, index):
         """Returns gt of test image
