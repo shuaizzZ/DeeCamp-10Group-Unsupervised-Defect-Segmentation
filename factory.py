@@ -21,9 +21,9 @@ def load_training_model_from_factory(configs):
 
 
 def load_test_model_from_factory(configs):
-    if configs['model']['name'] == 'SSIM_Net':
-        from model.networks import SSIM_Net
-        net = SSIM_Net(code_dim=configs['model']['code_dim'])
+    if configs['model']['name'] == 'SSIM_Net_v1':
+        from model.networks import SSIM_Net_v1
+        net = SSIM_Net_v1(code_dim=configs['model']['code_dim'])
     elif configs['model']['name'] == 'SSIM_Net_v2':
         from model.networks import SSIM_Net_v2
         net = SSIM_Net_v2(code_dim=configs['model']['code_dim'])
