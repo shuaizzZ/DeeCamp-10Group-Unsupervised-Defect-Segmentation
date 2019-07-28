@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # load data set
     mvtec = MVTEC(root=configs['db']['data_dir'], set=configs['db']['train_split'],
-                  preproc=MVTEC_pre(resize=tuple(configs['db']['resize']), crop_size=tuple(configs['db']['crop_size'])))
+                  preproc=MVTEC_pre(resize=tuple(configs['db']['resize'])))
     print('Data set: {} has been loaded'.format(configs['db']['name']))
 
     # load model
