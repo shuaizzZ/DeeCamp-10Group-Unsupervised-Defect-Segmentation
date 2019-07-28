@@ -28,15 +28,9 @@ class Transform(object):
 
     def __call__(self, image):
         image = cv2.resize(image, self.resize)
-        cv2.imwrite('./ori.jpg', image)
-        tile1 = image[0:128, 0:128]
-        tile2 = image[0:128, 128:256]
-        tile3 = image[128:256, 0:128]
-        tile4 = image[128:256, 128:256]
-        tile = np.array([tile1, tile2, tile3, tile4])
-        tile = tile.astype(np.float32) / 255.
-        tile = tile.transpose((0, 3, 1, 2))
-        tile = torch.from_numpy(tile)
+        image = image.astype(np.float32) / 255.
+        image = image.transpose((2, 0, 1))
+        image = torch.from_numpy(image)
 
-        return tile
+        return image.unsqueeze(0)
 

@@ -25,7 +25,8 @@ class Preproc(object):
 
     def __call__(self, image):
         image = cv2.resize(image, self.resize)
-        tile = crop(image, crop_size=self.crop_size)
+        # tile = crop(image, crop_size=self.crop_size)
+        tile = image
         p = np.random.uniform(0, 1)
         if p > 0.5:
             tile = mirror(tile)

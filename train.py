@@ -110,6 +110,9 @@ if __name__ == '__main__':
             mes += '|| Batch time: %.4f sec.' % batch_time
             log.wr_mes(mes)
             print(mes)
+    save_name = '{}-final.pth'.format(args.cfg)
+    save_path = os.path.join(save_dir, save_name)
+    trainer.save_params(save_path)
     log.close()
     exit(0)
 
