@@ -28,9 +28,10 @@ class Transform(object):
 
     def __call__(self, image):
         image = cv2.resize(image, self.resize)
+        ori_img = image.copy()
         image = image.astype(np.float32) / 255.
         image = image.transpose((2, 0, 1))
         image = torch.from_numpy(image)
 
-        return image.unsqueeze(0)
+        return ori_img, image.unsqueeze(0)
 
