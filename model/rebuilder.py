@@ -1,6 +1,11 @@
-import numpy as np
+"""inference container
+
+author: Haixin wang
+e-mail: haixinwa@gmail.com
+"""
 import torch
 import torch.nn as nn
+import numpy as np
 
 
 class Network(nn.Module):

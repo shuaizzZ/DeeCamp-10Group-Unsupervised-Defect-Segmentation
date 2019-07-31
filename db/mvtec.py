@@ -13,7 +13,6 @@ from .augment import *
 from .eval_func import *
 
 
-
 class Preproc(object):
     """Pre-procession of input image includes resize, crop & data augmentation
 

@@ -1,4 +1,8 @@
-# RED-Net：Residual Encoder-Decoder Networks
+"""Residual Encoder-Decoder Networks
+
+author: Haixin wang
+e-mail: haixinwa@gmail.com
+"""
 import torch.nn as nn
 
 

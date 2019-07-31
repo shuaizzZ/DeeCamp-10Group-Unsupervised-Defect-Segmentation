@@ -1,3 +1,8 @@
+"""Evaluation function
+
+author: Haixin wang
+e-mail: haixinwa@gmail.com
+"""
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
