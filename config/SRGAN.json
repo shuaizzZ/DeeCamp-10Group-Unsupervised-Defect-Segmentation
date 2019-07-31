@@ -1,13 +1,13 @@
 {
     "model": {
-        "name": "SSIM_Net_v2",
+        "name": "SRGAN",
         "code_dim": 256,
         "fp16": false
     },
     "op": {
-        "loss": "SSIM_loss",
+        "loss": "SRGAN_loss",
         "window_size":11,
-
+        "upscale_factor":8,
         "start_epoch": 0,
         "max_epoch": 200,
         "snapshot": 10,
@@ -17,8 +17,8 @@
     },
     "db": {
         "name": "mvtec",
-        "data_dir": "D:/DataSet/mvtec_anomaly_detection",
-        "loader_threads": 1,
+        "data_dir": "/Users/kristine/Desktop/mvtec_anomaly_detection",
+        "loader_threads": 4,
         "train_split": "train",
         "val_split": "test",
         "resize": [256, 256],
