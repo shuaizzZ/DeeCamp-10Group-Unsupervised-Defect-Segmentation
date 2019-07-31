@@ -1,3 +1,10 @@
+"""training container
+
+author: Haixin wang
+e-mail: haixinwa@gmail.com
+"""
+
+
 import torch
 import torch.nn as nn
 

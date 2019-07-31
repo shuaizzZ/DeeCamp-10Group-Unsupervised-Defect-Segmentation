@@ -1,4 +1,4 @@
-"""Data set tool of MVTEC
+"""Autoencoder with ssim loss
 
 author: Haixin wang
 e-mail: haixinwa@gmail.com

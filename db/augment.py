@@ -1,3 +1,9 @@
+"""Augmentation function
+
+author: Haixin wang
+e-mail: haixinwa@gmail.com
+"""
+
 import cv2
 import random
 
