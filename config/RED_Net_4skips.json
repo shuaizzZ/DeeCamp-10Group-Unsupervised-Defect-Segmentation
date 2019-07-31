@@ -1,6 +1,6 @@
 {
     "model": {
-        "name": "RED_Net",
+        "name": "RED_Net_4skips",
         "code_dim": 256,
         "fp16": false
     },
