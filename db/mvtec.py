@@ -102,7 +102,9 @@ class MVTEC(data.Dataset):
             return self.test_len
 
     def eval(self, eval_dir):
+        summary_file = open(os.path.join(eval_dir, 'summary.txt'), 'w')
         for item in self.test_dict:
+            summary_file.write('--------------{}--------------\n'.format(item))
             labels = list()
             paccs = list()
             ious = list()
@@ -111,7 +113,7 @@ class MVTEC(data.Dataset):
             log_file = open(os.path.join(eval_dir, item, 'result.txt'), 'w')
             log_file.write('Item: {}\n'.format(item))
             for type in os.listdir(res_dir):
-                log_file.write('Type: {}\n'.format(type))
+                log_file.write('--------------------------\nType: {}\n'.format(type))
                 type_dir = os.path.join(res_dir, type)
                 type_ious = list()
                 type_paccs = list()
@@ -139,16 +141,21 @@ class MVTEC(data.Dataset):
                 if type == 'good':
                     log_file.write('mean IoU: nan\n')
                 else:
-                    log_file.write('mean IoU:{:2f}\n'.format(np.array(type_ious).mean() * 100))
+                    log_file.write('mean IoU:{:.2f}\n'.format(np.array(type_ious).mean() * 100))
                 log_file.write('mean Pixel Accuracy:{:2f}\n'.format(np.array(type_paccs).mean() * 100))
                 ious += type_ious
                 paccs += type_paccs
-            log_file.write('Total mean IoU:{:2f}\n'.format(np.array(ious).mean()*100))
-            log_file.write('Total mean Pixel Accuracy:{:2f}\n'.format(np.array(paccs).mean()*100))
+            mIoU = np.array(ious).mean()
+            mPAc = np.array(paccs).mean()
+            log_file.write('--------------------------\n')
+            log_file.write('Total mean IoU:{:.2f}\n'.format(mIoU*100))
+            log_file.write('Total mean Pixel Accuracy:{:.2f}\n'.format(mPAc*100))
+            summary_file.write('mIoU:{:.2f}     mPAcc:{:.2f}\n'.format(mIoU*100, mPAc*100))
             # TPR_arr, FPR_arr = cal_ROC(np.array(preds), np.array(labels))
             # AUC = cal_AUC(TPR_arr, FPR_arr)
             # log_file.write('AUC{:2f}'.format(AUC * 100))
             log_file.write('\n')
+            log_file.close()
             pass
 
 # test

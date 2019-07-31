@@ -49,7 +49,6 @@ if __name__ == '__main__':
     log = Log(args.log_dir, args.cfg)
     log.wr_cfg(configs)
 
-
     mvtec = MVTEC(root=configs['db']['data_dir'], set=configs['db']['train_split'],
                   preproc=MVTEC_pre(resize=tuple(configs['db']['resize'])))
     # load model
@@ -71,7 +70,6 @@ if __name__ == '__main__':
     max_iter = max_epoch * epoch_size
     print('Start training...')
     epoch = 0
-
 
     results = {'d_loss': [], 'g_loss': [], 'd_score': [], 'g_score': [], 'psnr': [], 'ssim': []}
 
