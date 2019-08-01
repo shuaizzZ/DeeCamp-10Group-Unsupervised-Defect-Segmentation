@@ -10,11 +10,13 @@ def ssim_seg(ori_img, re_img, threshold=64):
     return: s_map: mask
     """
     # convert the images to grayscale
-    ori_gray = cv2.cvtColor(ori_img, cv2.COLOR_BGR2GRAY)
-    re_gray = cv2.cvtColor(re_img, cv2.COLOR_BGR2GRAY)
+    if len(ori_img.shape) == 3:
+        ori_img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2GRAY)
+    if len(re_img.shape) == 3:
+        re_img = cv2.cvtColor(re_img, cv2.COLOR_BGR2GRAY)
 
     # compute ssim , s: The value of ssim, d: the similar map
-    (s, s_map) = compare_ssim(ori_gray, re_gray, full=True)
+    (s, s_map) = compare_ssim(ori_img, re_img, full=True)
     s_map = np.clip(s_map, 0, 1)
     s_map = (s_map * 255).astype("uint8")
 

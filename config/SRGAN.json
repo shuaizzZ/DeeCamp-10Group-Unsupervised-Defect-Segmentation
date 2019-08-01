@@ -2,6 +2,7 @@
     "model": {
         "name": "SRGAN",
         "code_dim": 256,
+        "img_channel": 3,
         "fp16": false
     },
     "op": {

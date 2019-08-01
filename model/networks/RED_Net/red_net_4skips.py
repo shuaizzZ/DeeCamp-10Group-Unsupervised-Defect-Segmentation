@@ -45,9 +45,9 @@ class BNDeConv(nn.Module):
 
 
 class RED_Net(nn.Module):
-    def __init__(self, code_dim):
+    def __init__(self, code_dim, img_channel):
         super(RED_Net, self).__init__()
-        self.conv0 = BNConv(in_planes=3, out_planes=32, kernel_size=3, stride=2, padding=1)
+        self.conv0 = BNConv(in_planes=img_channel, out_planes=32, kernel_size=3, stride=2, padding=1)
         self.conv1 = BNConv(in_planes=32, out_planes=64, kernel_size=3, stride=2, padding=1)
         self.conv2 = BNConv(in_planes=64, out_planes=64, kernel_size=1, stride=1, padding=0)
         self.conv3 = BNConv(in_planes=64, out_planes=64, kernel_size=3, stride=2, padding=1)
@@ -74,7 +74,7 @@ class RED_Net(nn.Module):
         self.deconv8 = BNDeConv(in_planes=64, out_planes=64, kernel_size=3, stride=1, padding=1)
         self.deconv9 = BNDeConv(in_planes=64, out_planes=32, kernel_size=4, stride=2, padding=1)
         self.deconv10 = BNDeConv(in_planes=32, out_planes=32, kernel_size=4, stride=2, padding=1)
-        self.deconv_f = BNDeConv(in_planes=32, out_planes=3, kernel_size=1, stride=1, padding=0, relu=False)
+        self.deconv_f = BNDeConv(in_planes=32, out_planes=img_channel, kernel_size=1, stride=1, padding=0, relu=False)
         self.activate = nn.Sigmoid()
 
     def forward(self, x):
