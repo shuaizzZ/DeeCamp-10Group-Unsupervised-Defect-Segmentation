@@ -2,6 +2,7 @@
     "model": {
         "name": "RED_Net_3skips",
         "code_dim": 256,
+        "img_channel": 3,
         "fp16": false
     },
     "op": {
@@ -22,7 +23,7 @@
         "train_split": "train",
         "val_split": "test",
         "resize": [256, 256],
-        "batch_size": 128
+        "batch_size": 16
     },
     "system": {
         "resume": false,

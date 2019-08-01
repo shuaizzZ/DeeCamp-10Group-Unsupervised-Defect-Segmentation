@@ -3,6 +3,7 @@
 author: Haixin wang
 e-mail: haixinwa@gmail.com
 """
+import torch
 import torch.nn as nn
 
 
@@ -45,26 +46,22 @@ class BNDeConv(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, code_dim):
+    def __init__(self, code_dim, img_channel):
         super(Encoder, self).__init__()
-        self.conv1 = BNConv(in_planes=3, out_planes=32, kernel_size=4, stride=2, padding=1, relu=False)
+        self.conv1 = BNConv(in_planes=img_channel, out_planes=32, kernel_size=3, stride=2, padding=1, relu=False)
         self.activation1 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv2 = BNConv(in_planes=32, out_planes=32, kernel_size=3, stride=1, padding=1, relu=False)
+        self.conv2 = BNConv(in_planes=32, out_planes=32, kernel_size=3, stride=2, padding=1, relu=False)
         self.activation2 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv3 = BNConv(in_planes=32, out_planes=32, kernel_size=4, stride=2, padding=1, relu=False)
+        self.conv3 = BNConv(in_planes=32, out_planes=32, kernel_size=3, stride=2, padding=1, relu=False)
         self.activation3 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv4 = BNConv(in_planes=32, out_planes=64, kernel_size=3, stride=1, padding=1, relu=False)
+        self.conv4 = BNConv(in_planes=32, out_planes=64, kernel_size=3, stride=2, padding=1, relu=False)
         self.activation4 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv5 = BNConv(in_planes=64, out_planes=64, kernel_size=4, stride=2, padding=1, relu=False)
+        self.conv5 = BNConv(in_planes=64, out_planes=64, kernel_size=3, stride=2, padding=1, relu=False)
         self.activation5 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv6 = BNConv(in_planes=64, out_planes=128, kernel_size=3, stride=1, padding=1, relu=False)
+        self.conv6 = BNConv(in_planes=64, out_planes=64, kernel_size=3, stride=2, padding=1, relu=False)
         self.activation6 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv7 = BNConv(in_planes=128, out_planes=64, kernel_size=4, stride=2, padding=1, relu=False)
-        self.activation7 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv8 = BNConv(in_planes=64, out_planes=32, kernel_size=4, stride=2, padding=1, relu=False)
-        self.activation8 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.conv9 = BNConv(in_planes=32, out_planes=code_dim, kernel_size=3, stride=1, padding=1, relu=False)
-        self.activation9 = nn.ReLU(inplace=True)
+        self.conv7 = BNConv(in_planes=64, out_planes=code_dim, kernel_size=3, stride=1, padding=1, relu=False)
+        self.activation7 = nn.ReLU(inplace=True)
 
     def forward(self, x):
         x = self.activation1(self.conv1(x))
@@ -74,22 +71,20 @@ class Encoder(nn.Module):
         x = self.activation5(self.conv5(x))
         x = self.activation6(self.conv6(x))
         x = self.activation7(self.conv7(x))
-        x = self.activation8(self.conv8(x))
-        x = self.activation9(self.conv9(x))
 
         return x
 
 
 class Decoder(nn.Module):
-    def __init__(self, code_dim):
+    def __init__(self, code_dim, img_channel):
         super(Decoder, self).__init__()
-        self.deconv1 = BNConv(in_planes=code_dim, out_planes=32, kernel_size=3, stride=1, padding=1, relu=False)
+        self.deconv1 = BNDeConv(in_planes=code_dim, out_planes=64, kernel_size=4, stride=2, padding=1, relu=False)
         self.activation1 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.deconv2 = BNDeConv(in_planes=32, out_planes=64, kernel_size=4, stride=2, padding=1, relu=False)
+        self.deconv2 = BNDeConv(in_planes=64, out_planes=64, kernel_size=4, stride=2, padding=1, relu=False)
         self.activation2 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.deconv3 = BNDeConv(in_planes=64, out_planes=128, kernel_size=4, stride=2, padding=1, relu=False)
+        self.deconv3 = BNConv(in_planes=64, out_planes=64, kernel_size=3, stride=1, padding=1, relu=False)
         self.activation3 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.deconv4 = BNConv(in_planes=128, out_planes=64, kernel_size=3, stride=1, padding=1, relu=False)
+        self.deconv4 = BNDeConv(in_planes=64, out_planes=64, kernel_size=4, stride=2, padding=1, relu=False)
         self.activation4 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
         self.deconv5 = BNDeConv(in_planes=64, out_planes=64, kernel_size=4, stride=2, padding=1, relu=False)
         self.activation5 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
@@ -97,12 +92,11 @@ class Decoder(nn.Module):
         self.activation6 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
         self.deconv7 = BNDeConv(in_planes=32, out_planes=32, kernel_size=4, stride=2, padding=1, relu=False)
         self.activation7 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.deconv8 = BNConv(in_planes=32, out_planes=32, kernel_size=3, stride=1, padding=1, relu=False)
+        self.deconv8 = BNDeConv(in_planes=32, out_planes=32, kernel_size=4, stride=2, padding=1, relu=False)
         self.activation8 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.deconv9 = BNDeConv(in_planes=32, out_planes=32, kernel_size=4, stride=2, padding=1, relu=False)
+        self.deconv9 = BNConv(in_planes=32, out_planes=32, kernel_size=3, stride=1, padding=1, relu=False)
         self.activation9 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
-        self.deconv10 = BNConv(in_planes=32, out_planes=3, kernel_size=3, stride=1, padding=1, relu=False)
-        self.activation10 = nn.ReLU(inplace=True)
+        self.deconv10 = BNConv(in_planes=32, out_planes=img_channel, kernel_size=1, stride=1, padding=0, relu=False)
 
     def forward(self, x):
         x = self.activation1(self.deconv1(x))
@@ -114,16 +108,17 @@ class Decoder(nn.Module):
         x = self.activation7(self.deconv7(x))
         x = self.activation8(self.deconv8(x))
         x = self.activation9(self.deconv9(x))
-        x = self.activation10(self.deconv10(x))
+        x = self.deconv10(x)
+        x = (torch.tanh(x) + 1) / 2
 
         return x
 
 
 class SSIM_Net(nn.Module):
-    def __init__(self, code_dim):
+    def __init__(self, code_dim, img_channel):
         super(SSIM_Net, self).__init__()
-        self.encoder = Encoder(code_dim)
-        self.decoder = Decoder(code_dim)
+        self.encoder = Encoder(code_dim, img_channel)
+        self.decoder = Decoder(code_dim, img_channel)
 
     def forward(self, x):
         x = self.encoder(x)

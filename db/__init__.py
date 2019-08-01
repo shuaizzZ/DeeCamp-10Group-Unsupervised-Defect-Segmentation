@@ -3,6 +3,8 @@ import numpy as np
 import torch
 from .mvtec import MVTEC
 from .mvtec import Preproc as MVTEC_pre
+from .chip import CHIP
+from .chip import Preproc as CHIP_pre
 
 
 def training_collate(batch):
@@ -30,8 +32,13 @@ class Transform(object):
         image = cv2.resize(image, self.resize)
         ori_img = image.copy()
         image = image.astype(np.float32) / 255.
-        image = image.transpose((2, 0, 1))
-        image = torch.from_numpy(image)
+        if len(image.shape) == 3:
+            image = image.transpose((2, 0, 1))
+            image = torch.from_numpy(image)
+        else:
+            image = torch.from_numpy(image)
+            image = image.unsqueeze(0)
+
 
         return ori_img, image.unsqueeze(0)
 

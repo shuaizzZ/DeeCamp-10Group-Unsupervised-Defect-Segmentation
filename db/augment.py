@@ -17,8 +17,14 @@ def crop(image, crop_size):
 
 
 def mirror(image):
-    _, width, _ = image.shape
+    _, width = image.shape[0:2]
     image_m = image[:, ::-1]
+
+    return image_m
+
+
+def flip(image):
+    image_m = image[::-1, :]
 
     return image_m
 

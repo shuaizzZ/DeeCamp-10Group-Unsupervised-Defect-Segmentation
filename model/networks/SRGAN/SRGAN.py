@@ -11,7 +11,6 @@ from torch import nn
 class Generator(nn.Module):
     def __init__(self, scale_factor):
         upsample_block_num = int(math.log(scale_factor, 2))
-
         super(Generator, self).__init__()
         self.average = nn.AvgPool2d(kernel_size = 2,stride=2 )
         self.block1 = nn.Sequential(
@@ -33,7 +32,6 @@ class Generator(nn.Module):
         block8 = [UpsampleBLock(64, 2) for _ in range(upsample_block_num)]
         block8.append(nn.Conv2d(64, 3, kernel_size=9, padding=4))
         self.block8 = nn.Sequential(*block8)
-
 
     def forward(self, x):
         x = self.average(x)

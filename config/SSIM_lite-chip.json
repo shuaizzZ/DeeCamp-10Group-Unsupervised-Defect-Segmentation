@@ -1,7 +1,8 @@
 {
     "model": {
-        "name": "SSIM_Net_v1",
-        "code_dim": 256,
+        "name": "SSIM_Net_lite",
+        "code_dim": 128,
+        "img_channel": 1,
         "fp16": false
     },
     "op": {
@@ -9,16 +10,16 @@
         "window_size":11,
 
         "start_epoch": 0,
-        "max_epoch": 200,
+        "max_epoch": 60,
         "snapshot": 10,
-        "learning_rate": 4e-3,
+        "learning_rate": 5e-4,
         "decay_rate": 10,
-        "epoch_steps": [150, 200]
+        "epoch_steps": [45, 60]
     },
     "db": {
-        "name": "mvtec",
-        "data_dir": "D:/DataSet/mvtec_anomaly_detection",
-        "loader_threads": 4,
+        "name": "chip_sub",
+        "data_dir": "D:/DataSet/chip_sub",
+        "loader_threads": 1,
         "train_split": "train",
         "val_split": "test",
         "resize": [256, 256],

@@ -1,7 +1,7 @@
 import os
 import json
 import argparse
-from db import MVTEC, MVTEC_pre, training_collate
+from db import training_collate
 from model.trainer import Trainer
 from tools import Timer, Log
 from factory import *
@@ -55,8 +55,7 @@ if __name__ == '__main__':
     log.wr_cfg(configs)
 
     # load data set
-    mvtec = MVTEC(root=configs['db']['data_dir'], set=configs['db']['train_split'],
-                  preproc=MVTEC_pre(resize=tuple(configs['db']['resize'])))
+    training_set = load_data_set_from_factory(configs, 'train')
     print('Data set: {} has been loaded'.format(configs['db']['name']))
 
     # load model
@@ -65,7 +64,7 @@ if __name__ == '__main__':
     print('Model: {} has been loaded'.format(configs['model']['name']))
 
     # start training
-    epoch_size = len(mvtec) // batch_size  # init learning rate & iters
+    epoch_size = len(training_set) // batch_size  # init learning rate & iters
     start_iter = start_epoch * epoch_size
     max_iter = max_epoch * epoch_size
     print('Start training...')
@@ -74,7 +73,7 @@ if __name__ == '__main__':
     for iteration in range(start_iter, max_iter):
         # reset batch iterator
         if iteration % epoch_size == 0:
-            batch_iterator = iter(torch.utils.data.DataLoader(mvtec, batch_size, shuffle=True,
+            batch_iterator = iter(torch.utils.data.DataLoader(training_set, batch_size, shuffle=True,
                                                               num_workers=loader_threads, collate_fn=training_collate))
             # save parameters
             if epoch % snapshot == 0 and iteration > start_iter:
@@ -110,7 +109,7 @@ if __name__ == '__main__':
             mes += '|| Batch time: %.4f sec.' % batch_time
             log.wr_mes(mes)
             print(mes)
-    save_name = '{}-final.pth'.format(args.cfg)
+    save_name = '{}-{:d}.pth'.format(args.cfg, epoch)
     save_path = os.path.join(save_dir, save_name)
     trainer.save_params(save_path)
     log.close()

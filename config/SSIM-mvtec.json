@@ -1,7 +1,8 @@
 {
     "model": {
-        "name": "SSIM_Net_v2",
+        "name": "SSIM_Net",
         "code_dim": 256,
+        "img_channel": 3,
         "fp16": false
     },
     "op": {
@@ -22,7 +23,7 @@
         "train_split": "train",
         "val_split": "test",
         "resize": [256, 256],
-        "batch_size": 2
+        "batch_size": 16
     },
     "system": {
         "resume": false,

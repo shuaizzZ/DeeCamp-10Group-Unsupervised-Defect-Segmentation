@@ -7,6 +7,7 @@ import torch
 from torch import nn
 from model.networks.SRGAN.vgg import vgg16
 
+
 class GeneratorLoss(nn.Module):
     def __init__(self):
         super(GeneratorLoss, self).__init__()

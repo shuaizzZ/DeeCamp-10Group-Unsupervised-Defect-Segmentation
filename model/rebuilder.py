@@ -55,8 +55,6 @@ class Rebuilder:
             out = self.network(input_tensor)
         out = out * 255
         out = out.cpu().numpy()[0]
-        out = np.clip(out, 0, 255)
         out = out.astype(np.uint8)
-        out_image = out.transpose((1, 2, 0))
 
-        return out_image
+        return out
