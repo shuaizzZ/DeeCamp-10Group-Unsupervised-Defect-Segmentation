@@ -28,15 +28,15 @@ class Preproc(object):
         image = cv2.resize(image, self.resize)
         # random transformation
         p = random.uniform(0, 1)
-        if (p > 0.2) and (p <= 0.4):
+        if (p > 0.25) and (p <= 0.5):
             image = mirror(image)
-        elif (p > 0.4) and (p <= 0.6):
+        elif (p > 0.5) and (p <= 0.75):
             image = flip(image)
-        elif (p > 0.6) and (p <= 0.8):
-            image = shift(image, (-12, 12))
         else:
-            image = rotation(image, (-10, 10))
-            
+            image = shift(image, (-12, 12))
+        # else:
+        #     image = rotation(image, (-10, 10))
+
         # light adjustment
         p = random.uniform(0, 1)
         if p > 0.5:

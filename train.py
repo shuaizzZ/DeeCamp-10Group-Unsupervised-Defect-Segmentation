@@ -61,6 +61,8 @@ if __name__ == '__main__':
     # load model
     net, loss, optimizer = load_training_model_from_factory(configs)
     trainer = Trainer(net, loss, optimizer, ngpu=args.ngpu)
+    if configs['system']['resume']:
+        trainer.load_params(configs['system']['resume_path'])
     print('Model: {} has been loaded'.format(configs['model']['name']))
 
     # start training
