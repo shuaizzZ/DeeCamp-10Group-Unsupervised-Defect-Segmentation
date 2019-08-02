@@ -27,9 +27,16 @@ class Preproc(object):
     def __call__(self, image):
         image = cv2.resize(image, self.resize)
         # image = crop(image, crop_size=self.crop_size)
-        p = np.random.uniform(0, 1)
-        if p > 0.5:
+        # random transformation
+        p = random.uniform(0, 1)
+        if (p > 0.33) and (p <= 0.66):
             image = mirror(image)
+        else:
+            image = flip(image)
+        # light adjustment
+        p = random.uniform(0, 1)
+        if p > 0.5:
+            image = lighting_adjust(image, k=(0.95, 1.05), b=(-10, 10))
 
         # image normal
         image = image.astype(np.float32) / 255.
