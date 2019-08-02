@@ -49,6 +49,7 @@ def lighting_adjust(image, k, b):
 
     return image.astype(np.uint8)
 
+
 def normalize_(image, mean, std):
     image -= mean
     image /= std
