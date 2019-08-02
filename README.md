@@ -24,7 +24,7 @@ the defect.
 ![architecture](https://github.com/shuaizzZ/DeeCamp-10Group-Unsupervised-Defect-Segmentation/blob/master/architecture.jpg)
 
 # Directory 
-- config: This repo includes configuration file for training and evaluation. The parameters are saved in `.jason` file.
-- db: This repo includes codes of data set tools
-- model: Our networks codes are in `model/netwroks` and segmentation codes are in `mode/segmentation`.
-- tools: This repo includes codes of auxiliary function just like timer, log writer and so on. 
+- `/config`: This repo includes configuration file for training and evaluation. The parameters are saved in `.jason` file.
+- `/db`: This repo includes codes of data set tools
+- `/model`: Our networks codes are in `model/netwroks` and segmentation codes are in `mode/segmentation`.
+- `/tools`: This repo includes codes of auxiliary function just like timer, log writer and so on. 

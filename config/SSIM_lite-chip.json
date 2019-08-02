@@ -14,12 +14,12 @@
         "snapshot": 10,
         "learning_rate": 5e-4,
         "decay_rate": 10,
-        "epoch_steps": [45, 60]
+        "epoch_steps": [50, 60]
     },
     "db": {
-        "name": "chip_sub",
-        "data_dir": "D:/DataSet/chip_sub",
-        "loader_threads": 1,
+        "name": "chip_cell",
+        "data_dir": "D:/DataSet/chip_cell",
+        "loader_threads": 4,
         "train_split": "train",
         "val_split": "test",
         "resize": [256, 256],

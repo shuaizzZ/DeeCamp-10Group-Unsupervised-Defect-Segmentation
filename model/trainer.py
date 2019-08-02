@@ -38,6 +38,19 @@ class Trainer():
             params = self.net.state_dict()
             torch.save(params, f)
 
+    def load_params(self, path):
+        from collections import OrderedDict
+        new_state_dict = OrderedDict()
+        w_dict = torch.load(path)
+        for k, v in w_dict.items():
+            head = k[:7]
+            if head == 'module.':
+                name = k[7:] # remove `module.`
+            else:
+                name = k
+            new_state_dict[name] = v
+        self.net.load_state_dict(new_state_dict)
+
     def set_lr(self, lr):
         # print("setting learning rate to: {}".format(lr))
         for param_group in self.optimizer.param_groups:

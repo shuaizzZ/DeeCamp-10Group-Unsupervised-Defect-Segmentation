@@ -5,8 +5,9 @@ e-mail: haixinwa@gmail.com
 """
 import os
 import re
+import cv2
+import random
 import torch
-import numpy as np
 import torch.utils.data as data
 from collections import OrderedDict
 from .augment import *
@@ -22,16 +23,24 @@ class Preproc(object):
     """
     def __init__(self, resize):
         self.resize = resize
-        # self.crop_size = crop_size
 
     def __call__(self, image):
         image = cv2.resize(image, self.resize)
-        # image = crop(image, crop_size=self.crop_size)
-        p = np.random.uniform(0, 1)
-        if (p > 0.33) and (p <= 0.66):
+        # random transformation
+        p = random.uniform(0, 1)
+        if (p > 0.2) and (p <= 0.4):
             image = mirror(image)
-        elif p > 0.66:
+        elif (p > 0.4) and (p <= 0.6):
             image = flip(image)
+        elif (p > 0.6) and (p <= 0.8):
+            image = shift(image, (-12, 12))
+        else:
+            image = rotation(image, (-10, 10))
+
+        # light adjustment
+        p = random.uniform(0, 1)
+        if p > 0.5:
+            image = lighting_adjust(image, k=(0.75, 0.9), b=(-30, 0))
 
         # image normal
         image = image.astype(np.float32) / 255.
@@ -42,10 +51,10 @@ class Preproc(object):
 
 
 class CHIP(data.Dataset):
-    """A Comprehensive Real-World Dataset for Unsupervised Anomaly Detection
+    """A tiny data set for chip cell
 
     Arguments:
-        root (string): root directory to mvtec folder.
+        root (string): root directory to root folder.
         set (string): image set to use ('train', or 'test')
         preproc(callable, optional): pre-procession on the input image
     """
@@ -84,9 +93,7 @@ class CHIP(data.Dataset):
         """
         img_path = self.ids[index]
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-
-        if self.preproc is not None:
-            img = self.preproc(img)
+        img = self.preproc(img)
 
         return img
 
