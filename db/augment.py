@@ -9,14 +9,6 @@ import random
 import numpy as np
 
 
-def crop(image, crop_size):
-    height, width, _ = image.shape
-    x_offset = random.randint(0, width - crop_size[0])
-    y_offset = random.randint(0, height - crop_size[1])
-
-    return image[y_offset: y_offset+crop_size[1], x_offset: x_offset+crop_size[0]]
-
-
 def mirror(image):
     image_m = image[:, ::-1]
 
@@ -27,11 +19,6 @@ def flip(image):
     image_f = image[::-1, :]
 
     return image_f
-
-
-def normalize_(image, mean, std):
-    image -= mean
-    image /= std
 
 
 def rotation(image, range):
@@ -61,3 +48,15 @@ def lighting_adjust(image, k, b):
     image = np.clip(image, 0, 255)
 
     return image.astype(np.uint8)
+
+def normalize_(image, mean, std):
+    image -= mean
+    image /= std
+
+
+def crop(image, crop_size):
+    height, width, _ = image.shape
+    x_offset = random.randint(0, width - crop_size[0])
+    y_offset = random.randint(0, height - crop_size[1])
+
+    return image[y_offset: y_offset+crop_size[1], x_offset: x_offset+crop_size[0]]

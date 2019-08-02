@@ -36,6 +36,7 @@ class Preproc(object):
             image = shift(image, (-12, 12))
         else:
             image = rotation(image, (-10, 10))
+            
         # light adjustment
         p = random.uniform(0, 1)
         if p > 0.5:

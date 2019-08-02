@@ -22,11 +22,9 @@ class Preproc(object):
     """
     def __init__(self, resize):
         self.resize = resize
-        # self.crop_size = crop_size
 
     def __call__(self, image):
         image = cv2.resize(image, self.resize)
-        # image = crop(image, crop_size=self.crop_size)
         # random transformation
         p = random.uniform(0, 1)
         if (p > 0.33) and (p <= 0.66):
