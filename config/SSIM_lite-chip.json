@@ -17,8 +17,8 @@
         "epoch_steps": [45, 60]
     },
     "db": {
-        "name": "chip_sub",
-        "data_dir": "D:/DataSet/chip_sub",
+        "name": "chip_cell",
+        "data_dir": "D:/DataSet/chip_cell",
         "loader_threads": 1,
         "train_split": "train",
         "val_split": "test",
