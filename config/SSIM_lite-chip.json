@@ -10,11 +10,11 @@
         "window_size":11,
 
         "start_epoch": 0,
-        "max_epoch": 60,
+        "max_epoch": 100,
         "snapshot": 10,
         "learning_rate": 5e-4,
         "decay_rate": 10,
-        "epoch_steps": [50, 60]
+        "epoch_steps": [95, 100]
     },
     "db": {
         "name": "chip_cell",
