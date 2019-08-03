@@ -64,7 +64,7 @@ def load_training_model_from_factory(configs):
     elif configs['model']['name'] == 'VAE_Net0':
         from model.loss import VAE_loss
         from model.networks import VAE_Net0
-        net = VAE_Net0(code_dim=configs['model']['code_dim'])
+        net = VAE_Net0(code_dim=configs['model']['code_dim'],phase='train')
         loss = VAE_loss()
         optimizer = torch.optim.Adam(net.parameters(), lr=configs['op']['learning_rate'], betas=(0.5, 0.999))
     else:
@@ -91,7 +91,7 @@ def load_test_model_from_factory(configs):
         net = RED_Net_4skips(code_dim=configs['model']['code_dim'], img_channel=configs['model']['img_channel'])
     elif configs['model']['name'] == 'VAE_Net0':
         from model.networks import VAE_Net0
-        net = VAE_Net0(code_dim=configs['model']['code_dim'])
+        net = VAE_Net0(code_dim=configs['model']['code_dim'],phase='inference')
     else:
         raise Exception("Invalid model name")
 
