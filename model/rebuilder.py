@@ -8,6 +8,7 @@ import torch.nn as nn
 import numpy as np
 
 
+
 class Network(nn.Module):
     def __init__(self, net, seg):
         super(Network, self).__init__()
@@ -56,5 +57,5 @@ class Rebuilder:
         out = out * 255
         out = out.cpu().numpy()[0]
         out = out.astype(np.uint8)
-
         return out
+
