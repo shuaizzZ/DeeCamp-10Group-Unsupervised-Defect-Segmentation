@@ -6,6 +6,7 @@ e-mail: haixinwa@gmail.com
 import torch
 import torch.nn as nn
 import numpy as np
+from model.networks import VAE_Net0
 
 
 class Network(nn.Module):
@@ -53,8 +54,14 @@ class Rebuilder:
             if self.fp16 is True:
                 input_tensor = input_tensor.half()
             out = self.network(input_tensor)
-        out = out * 255
-        out = out.cpu().numpy()[0]
-        out = out.astype(np.uint8)
+        if type(self.net)==VAE_Net0:
+            out = out[0] * 255
+            out = out.cpu().numpy()[0]
+            out = out.astype(np.uint8)
+        else:
+            out = out * 255
+            out = out.cpu().numpy()[0]
+            out = out.astype(np.uint8)
 
         return out
+
