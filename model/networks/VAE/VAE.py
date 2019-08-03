@@ -14,7 +14,7 @@ class decoder'''
 
 
 class VAE_Net0(nn.Module):
-    def __init__(self, code_dim):
+    def __init__(self, code_dim,phase):
         super(VAE_Net0, self).__init__()
         self.conv1 = nn.Conv2d(3, 6, kernel_size=5, stride=1)
         self.conv2 = nn.Conv2d(6, 12, kernel_size=5, stride=1)
@@ -30,6 +30,7 @@ class VAE_Net0(nn.Module):
         self.deconv10 = nn.ConvTranspose2d(6, 3, kernel_size=5, stride=1)
         self.Leakyrelu = nn.LeakyReLU(inplace=True, negative_slope=0.2)
         self.sigmoid = nn.Sigmoid()
+        self.phase=phase
 
     def encode(self, x):
         h1 = self.Leakyrelu(self.conv1(x))
@@ -53,5 +54,8 @@ class VAE_Net0(nn.Module):
     def forward(self, x):
         mu, logvar = self.encode(x)  #
         z = self.reparametrize(mu, logvar)
-        imag1_mu_logvar=[self.decode(z), mu, logvar]
-        return imag1_mu_logvar
+        imag1_mu_logvar = [self.decode(z), mu, logvar]
+        if self.phase=='train':
+            return imag1_mu_logvar
+        elif self.phase=='inference':
+            return self.decode(z)
