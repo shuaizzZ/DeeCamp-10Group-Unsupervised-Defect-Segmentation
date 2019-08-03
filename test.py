@@ -12,8 +12,8 @@ from factory import *
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Object detection base on anchor.')
-    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)
-    parser.add_argument('--model_path', help="Path of model", type=str,required=True)
+    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)#--cfg VAE
+    parser.add_argument('--model_path', help="Path of model", type=str,required=True)#--model_path ./weights/VAE-final.pth
     parser.add_argument('--gpu_id', help="ID of GPU", type=int, default=0)
     parser.add_argument('--res_dir', help="Directory path of result", type=str, default='./eval_result')
     parser.add_argument('--retest', default=False, type=bool)
