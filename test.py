@@ -138,7 +138,7 @@ if __name__ == '__main__':
     # test each image
     print('Start Testing... ')
     if configs['db']['name'] == 'mvtec':
-        test_mvtec(test_set, rebuilder, args.res_dir)
+        test_mvtec(test_set, rebuilder, transform, args.res_dir)
     elif configs['db']['name'] == 'chip_sub':
         test_chip(test_set, rebuilder, transform, args.res_dir)
     else:
