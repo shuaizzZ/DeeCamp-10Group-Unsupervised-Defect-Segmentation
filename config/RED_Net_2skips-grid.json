@@ -22,7 +22,7 @@
         "loader_threads": 4,
         "train_split": "train",
         "val_split": "test",
-        "resize": [256, 256],
+        "resize": [768, 768],
         "batch_size": 2
     },
     "system": {

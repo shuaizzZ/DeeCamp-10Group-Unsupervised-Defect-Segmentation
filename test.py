@@ -78,20 +78,16 @@ def test_chip(test_set, rebuilder, transform, save_dir):
         img_list = test_set.test_dict[type]
         if not os.path.exists(os.path.join(save_dir, type)):
             os.mkdir(os.path.join(save_dir, type))
-            os.mkdir(os.path.join(save_dir, type, 'ori'))
-            os.mkdir(os.path.join(save_dir, type, 'gen'))
-            os.mkdir(os.path.join(save_dir, type, 'mask'))
         for k, path in enumerate(img_list):
             image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
             _t.tic()
             ori_img, input_tensor = transform(image)
             out = rebuilder.inference(input_tensor)
             re_img = out[0]
-            mask = ssim_seg(ori_img, re_img, threshold=64)
+            mask = ssim_seg(ori_img, re_img, threshold=16)
             inference_time = _t.toc()
-            cv2.imwrite(os.path.join(save_dir, type, 'ori', '{:d}.png'.format(k)), ori_img)
-            cv2.imwrite(os.path.join(save_dir, type, 'gen', '{:d}.png'.format(k)), re_img)
-            cv2.imwrite(os.path.join(save_dir, type, 'mask', '{:d}.png'.format(k)), mask)
+            compare_img = np.concatenate((ori_img, re_img, mask), axis=1)
+            cv2.imwrite(os.path.join(save_dir, type, 'ori_gen_mask_{:d}.png'.format(k)), compare_img)
             cost_time.append(inference_time)
             if (k+1) % 20 == 0:
                 print('{}th image, cost time: {:.1f}'.format(k+1, inference_time*1000))
