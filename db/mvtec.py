@@ -27,7 +27,9 @@ class Preproc(object):
         image = cv2.resize(image, self.resize)
         # random transformation
         p = random.uniform(0, 1)
-        if (p > 0.33) and (p <= 0.66):
+        if p <= 0.33:
+            image = image
+        elif (p > 0.33) and (p <= 0.66):
             image = mirror(image)
         else:
             image = flip(image)

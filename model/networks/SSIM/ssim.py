@@ -103,7 +103,7 @@ class Decoder(nn.Module):
         self.deconv9 = BNDeConv(in_planes=32, out_planes=32, kernel_size=4, stride=2, padding=1, relu=False)
         self.activation9 = nn.LeakyReLU(inplace=True, negative_slope=0.2)
         self.deconv10 = BNConv(in_planes=32, out_planes=img_channel, kernel_size=3, stride=1, padding=1, relu=False)
-        # self.activation10 = nn.tanh(inplace=True)
+        self.activate = nn.Sigmoid()
 
     def forward(self, x):
         x = self.activation1(self.deconv1(x))
@@ -116,7 +116,7 @@ class Decoder(nn.Module):
         x = self.activation8(self.deconv8(x))
         x = self.activation9(self.deconv9(x))
         x = self.deconv10(x)
-        x = (torch.tanh(x) + 1) / 2
+        x = self.activate(x)
 
         return x
 
