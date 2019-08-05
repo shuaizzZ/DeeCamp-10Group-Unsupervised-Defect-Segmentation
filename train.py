@@ -95,7 +95,7 @@ if __name__ == '__main__':
         # load data
         _t.tic()
         images = next(batch_iterator)
-        images = torch.autograd.Variable(images.cuda())
+        # images = torch.autograd.Variable(images.cuda())
 
         # train
         loss = trainer.train(images)

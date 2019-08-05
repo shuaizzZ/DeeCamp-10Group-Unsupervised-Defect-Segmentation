@@ -32,15 +32,15 @@ class Preproc(object):
             image = mirror(image)
         elif (p > 0.4) and (p <= 0.6):
             image = flip(image)
-        elif (p > 0.6) and (p <= 0.8):
-            image = shift(image, (-12, 12))
-        else:
-            image = rotation(image, (-10, 10))
+        # elif (p > 0.6) and (p <= 0.8):
+        #     image = shift(image, (-12, 12))
+        # else:
+        #     image = rotation(image, (-10, 10))
 
         # light adjustment
         p = random.uniform(0, 1)
         if p > 0.5:
-            image = lighting_adjust(image, k=(0.75, 0.9), b=(-30, 0))
+            image = lighting_adjust(image, k=(0.8, 0.95), b=(-10, 10))
 
         # image normal
         image = image.astype(np.float32) / 255.

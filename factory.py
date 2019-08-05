@@ -13,7 +13,7 @@ def load_data_set_from_factory(configs, phase):
         else:
             raise Exception("Invalid phase name")
         set = MVTEC(root=configs['db']['data_dir'], set=set_name, preproc=preproc)
-    elif configs['db']['name'] == 'chip_cell':
+    elif configs['db']['name'] == 'chip':
         from db import CHIP, CHIP_pre
         if phase == 'train':
             set_name = configs['db']['train_split']
