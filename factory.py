@@ -32,45 +32,49 @@ def load_data_set_from_factory(configs, phase):
 
 def load_training_model_from_factory(configs):
     if configs['model']['name'] == 'SSIM_Net':
-        from model.loss import SSIM_loss
         from model.networks import SSIM_Net
         net = SSIM_Net(code_dim=configs['model']['code_dim'], img_channel=configs['model']['img_channel'])
-        loss = SSIM_loss(window_size=configs['op']['window_size'], channel=3)
         optimizer = torch.optim.Adam(net.parameters(), lr=configs['op']['learning_rate'], betas=(0.5, 0.999))
     elif configs['model']['name'] == 'SSIM_Net_lite':
-        from model.loss import SSIM_loss
         from model.networks import SSIM_Net_Lite
         net = SSIM_Net_Lite(code_dim=configs['model']['code_dim'], img_channel=configs['model']['img_channel'])
-        loss = SSIM_loss(window_size=configs['op']['window_size'], channel=3)
         optimizer = torch.optim.Adam(net.parameters(), lr=configs['op']['learning_rate'], betas=(0.5, 0.999))
     elif configs['model']['name'] == 'RED_Net_2skips':
-        from model.loss import SSIM_loss
         from model.networks import RED_Net_2skips
         net = RED_Net_2skips(code_dim=configs['model']['code_dim'], img_channel=configs['model']['img_channel'])
-        loss = SSIM_loss(window_size=configs['op']['window_size'], channel=3)
         optimizer = torch.optim.Adam(net.parameters(), lr=configs['op']['learning_rate'], betas=(0.5, 0.999))
     elif configs['model']['name'] == 'RED_Net_3skips':
-        from model.loss import SSIM_loss
         from model.networks import RED_Net_3skips
         net = RED_Net_3skips(code_dim=configs['model']['code_dim'], img_channel=configs['model']['img_channel'])
-        loss = SSIM_loss(window_size=configs['op']['window_size'], channel=3)
         optimizer = torch.optim.Adam(net.parameters(), lr=configs['op']['learning_rate'], betas=(0.5, 0.999))
     elif configs['model']['name'] == 'RED_Net_4skips':
-        from model.loss import SSIM_loss
         from model.networks import RED_Net_4skips
         net = RED_Net_4skips(code_dim=configs['model']['code_dim'], img_channel=configs['model']['img_channel'])
-        loss = SSIM_loss(window_size=configs['op']['window_size'], channel=3)
         optimizer = torch.optim.Adam(net.parameters(), lr=configs['op']['learning_rate'], betas=(0.5, 0.999))
     elif configs['model']['name'] == 'VAE_Net0':
-        from model.loss import VAE_loss
         from model.networks import VAE_Net0
         net = VAE_Net0(code_dim=configs['model']['code_dim'],phase='train')
-        loss = VAE_loss()
         optimizer = torch.optim.Adam(net.parameters(), lr=configs['op']['learning_rate'], betas=(0.5, 0.999))
     else:
         raise Exception("Invalid model name")
 
-    return net, loss, optimizer
+    return net, optimizer
+
+
+def load_loss_from_factory(configs):
+    if configs['op']['loss'] == 'SSIM_Net':
+        from model.loss import SSIM_loss
+        loss = SSIM_loss(window_size=configs['op']['window_size'], channel=configs['model']['img_channel'])
+    elif configs['op']['loss'] == 'Multi_SSIM_loss':
+        from model.loss import Multi_SSIM_loss
+        loss = Multi_SSIM_loss(window_sizes=configs['op']['window_size'], channel=configs['model']['img_channel'])
+    elif configs['op']['loss'] == 'VAE_loss':
+        from model.loss import VAE_loss
+        loss = VAE_loss()
+    else:
+        raise Exception('Wrong loss name')
+
+    return loss
 
 
 def load_test_model_from_factory(configs):

@@ -59,7 +59,8 @@ if __name__ == '__main__':
     print('Data set: {} has been loaded'.format(configs['db']['name']))
 
     # load model
-    net, loss, optimizer = load_training_model_from_factory(configs)
+    net, optimizer = load_training_model_from_factory(configs)
+    loss = load_loss_from_factory(configs)
     trainer = Trainer(net, loss, optimizer, ngpu=args.ngpu)
     if configs['system']['resume']:
         trainer.load_params(configs['system']['resume_path'])
