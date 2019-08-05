@@ -59,3 +59,5 @@ class VAE_Net0(nn.Module):
             return imag1_mu_logvar
         elif self.phase=='inference':
             return self.decode(z)
+        else:
+            raise Exception("Wrong phase")

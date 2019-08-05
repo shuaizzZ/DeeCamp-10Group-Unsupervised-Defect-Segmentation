@@ -12,8 +12,8 @@ from factory import *
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Object detection base on anchor.')
-    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)#--cfg VAE
-    parser.add_argument('--model_path', help="Path of model", type=str,required=True)#--model_path ./weights/VAE-final.pth
+    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)
+    parser.add_argument('--model_path', help="Path of model", type=str,required=True)
     parser.add_argument('--gpu_id', help="ID of GPU", type=int, default=0)
     parser.add_argument('--res_dir', help="Directory path of result", type=str, default='./eval_result')
     parser.add_argument('--retest', default=False, type=bool)
@@ -87,7 +87,7 @@ def test_chip(test_set, rebuilder, transform, save_dir):
             ori_img, input_tensor = transform(image)
             out = rebuilder.inference(input_tensor)
             re_img = out[0]
-            mask = ssim_seg(ori_img, re_img, threshold=128)
+            mask = ssim_seg(ori_img, re_img, threshold=64)
             inference_time = _t.toc()
             cv2.imwrite(os.path.join(save_dir, type, 'ori', '{:d}.png'.format(k)), ori_img)
             cv2.imwrite(os.path.join(save_dir, type, 'gen', '{:d}.png'.format(k)), re_img)
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     print('Start Testing... ')
     if configs['db']['name'] == 'mvtec':
         test_mvtec(test_set, rebuilder, transform, args.res_dir)
-    elif configs['db']['name'] == 'chip_sub':
+    elif configs['db']['name'] == 'chip':
         test_chip(test_set, rebuilder, transform, args.res_dir)
     else:
         raise Exception("Invalid set name")
