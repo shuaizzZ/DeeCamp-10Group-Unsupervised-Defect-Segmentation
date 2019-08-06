@@ -84,7 +84,7 @@ def test_chip(test_set, rebuilder, transform, save_dir):
             ori_img, input_tensor = transform(image)
             out = rebuilder.inference(input_tensor)
             re_img = out[0]
-            mask = ssim_seg(ori_img, re_img, threshold=16)
+            mask = ssim_seg(ori_img, re_img, threshold=64)
             inference_time = _t.toc()
             compare_img = np.concatenate((ori_img, re_img, mask), axis=1)
             cv2.imwrite(os.path.join(save_dir, type, 'ori_gen_mask_{:d}.png'.format(k)), compare_img)

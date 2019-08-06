@@ -7,14 +7,14 @@
     },
     "op": {
         "loss": "Multi_SSIM_loss",
-        "window_size":[3, 7, 11, 15],
+        "window_size":[3, 7, 15],
 
         "start_epoch": 0,
         "max_epoch": 200,
         "snapshot": 10,
         "learning_rate": 4e-3,
         "decay_rate": 10,
-        "epoch_steps": [150, 200]
+        "epoch_steps": [90, 150, 200]
     },
     "db": {
         "name": "chip",
@@ -22,7 +22,7 @@
         "loader_threads": 4,
         "train_split": "train",
         "val_split": "test",
-        "resize": [768, 768],
+        "resize": [512, 512],
         "batch_size": 2
     },
     "system": {
