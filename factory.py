@@ -62,7 +62,7 @@ def load_training_model_from_factory(configs):
 
 
 def load_loss_from_factory(configs):
-    if configs['op']['loss'] == 'SSIM_Net':
+    if configs['op']['loss'] == 'SSIM_loss':
         from model.loss import SSIM_loss
         loss = SSIM_loss(window_size=configs['op']['window_size'], channel=configs['model']['img_channel'])
     elif configs['op']['loss'] == 'Multi_SSIM_loss':

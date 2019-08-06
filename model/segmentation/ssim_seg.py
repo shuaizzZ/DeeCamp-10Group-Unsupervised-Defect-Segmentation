@@ -16,7 +16,7 @@ def ssim_seg(ori_img, re_img, threshold=64):
         re_img = cv2.cvtColor(re_img, cv2.COLOR_BGR2GRAY)
 
     # compute ssim , s: The value of ssim, d: the similar map
-    (s, s_map) = compare_ssim(ori_img, re_img, win_size=13, full=True)
+    (s, s_map) = compare_ssim(ori_img, re_img, win_size=15, full=True)
     s_map = np.clip(s_map, 0, 1)
     s_map = (s_map * 255).astype("uint8")
 

@@ -23,9 +23,11 @@ class Network(nn.Module):
 
 
 class Trainer():
-    def __init__(self, net, loss, optimizer, ngpu):
+    def __init__(self, net, loss, loss_name, optimizer, ngpu):
         self.net = net
         self.loss = loss
+        self.loss_name = loss_name
+        self.loss_value = None
         self.optimizer = optimizer
         self.network = torch.nn.DataParallel(Network(self.net, self.loss), device_ids=list(range(ngpu)))
         self.network.train()
@@ -57,10 +59,39 @@ class Trainer():
             param_group["lr"] = lr
 
     def train(self, input_tensor):
-        self.optimizer.zero_grad()
-        loss = self.network(input_tensor)
-        loss = loss.mean()
-        loss.backward()
-        self.optimizer.step()
+        if self.loss_name == 'SSIM_loss' or self.loss_name == 'VAE_loss':
+            self.optimizer.zero_grad()
+            loss = self.network(input_tensor)
+            loss = loss.mean()
+            loss.backward()
+            self.optimizer.step()
+            self.loss_value = loss.item()
 
-        return loss.item()
+        elif self.loss_name == 'Multi_SSIM_loss':
+            self.loss_value = list()
+            total_loss = list()
+            self.optimizer.zero_grad()
+            loss_multi = self.network(input_tensor)
+            for loss in loss_multi:
+                loss = loss.mean()
+                total_loss.append(loss)
+                self.loss_value.append(loss.item())
+            total_loss = torch.stack(total_loss, 0).sum()
+            total_loss.backward()
+            self.optimizer.step()
+
+        else:
+            raise Exception('Wrong loss name')
+
+    def get_loss_message(self):
+        if self.loss_name == 'SSIM_loss' or self.loss_name == 'VAE_loss':
+            mes = 'ssim loss:{:.4f};'.format(self.loss_value)
+
+        elif self.loss_name == 'Multi_SSIM_loss':
+            mes = ''
+            for k, loss in enumerate(self.loss_value):
+                mes += 'size{:d} ssim loss:{:.4f}; '.format(k, loss)
+        else:
+            raise Exception('Wrong loss name')
+
+        return mes

@@ -61,7 +61,7 @@ if __name__ == '__main__':
     # load model
     net, optimizer = load_training_model_from_factory(configs)
     loss = load_loss_from_factory(configs)
-    trainer = Trainer(net, loss, optimizer, ngpu=args.ngpu)
+    trainer = Trainer(net, loss, configs['op']['loss'], optimizer, ngpu=args.ngpu)
     if configs['system']['resume']:
         trainer.load_params(configs['system']['resume_path'])
     print('Model: {} has been loaded'.format(configs['model']['name']))
@@ -99,17 +99,17 @@ if __name__ == '__main__':
         # images = torch.autograd.Variable(images.cuda())
 
         # train
-        loss = trainer.train(images)
+        trainer.train(images)
         batch_time = _t.toc()
 
         # print message
         if iteration % 10 == 0:
             _t.clear()
-            mes = 'Epoch:' + repr(epoch) + ' || epochiter: ' + repr(iteration % epoch_size) + '/' + repr(epoch_size)
-            mes += ' || Totel iter ' + repr(iteration)
-            mes += ' || loss: %.4f ' % loss
-            mes += '|| LR: %.8f ' % (lr)
-            mes += '|| Batch time: %.4f sec.' % batch_time
+            mes = 'Epoch:' + repr(epoch) + '||epochiter: ' + repr(iteration % epoch_size) + '/' + repr(epoch_size)
+            mes += '||Totel iter: ' + repr(iteration)
+            mes += '||{}'.format(trainer.get_loss_message())
+            mes += '||LR: %.8f' % (lr)
+            mes += '||Batch time: %.4f sec.' % batch_time
             log.wr_mes(mes)
             print(mes)
     save_name = '{}-{:d}.pth'.format(args.cfg, epoch)
