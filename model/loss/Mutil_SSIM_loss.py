@@ -76,8 +76,8 @@ class Multi_SSIM_loss(nn.Module):
         self.losses = nn.ModuleList(self.losses)
 
     def forward(self, img1, img2):
-        loss = 0
+        loss_multi = list()
         for i in range(len(self.losses)):
-            loss += self.losses[i](img1, img2)
+            loss_multi.append(self.losses[i](img1, img2))
 
-        return loss
+        return loss_multi
