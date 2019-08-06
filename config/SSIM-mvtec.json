@@ -10,11 +10,11 @@
         "window_size":[3, 7, 15],
 
         "start_epoch": 0,
-        "max_epoch": 200,
+        "max_epoch": 120,
         "snapshot": 10,
-        "learning_rate": 4e-3,
+        "learning_rate": 1e-3,
         "decay_rate": 10,
-        "epoch_steps": [50, 150]
+        "epoch_steps": [50, 120]
     },
     "db": {
         "name": "mvtec",
@@ -23,7 +23,7 @@
         "train_split": "train",
         "val_split": "test",
         "resize": [256, 256],
-        "batch_size": 16
+        "batch_size": 2
     },
     "system": {
         "resume": false,
