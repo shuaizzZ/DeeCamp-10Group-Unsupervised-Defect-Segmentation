@@ -12,11 +12,10 @@ class Generator(nn.Module):
     def __init__(self, scale_factor):
         upsample_block_num = int(math.log(scale_factor, 2))
         super(Generator, self).__init__()
-        self.average = nn.AvgPool2d(kernel_size = 2,stride=2 )
+        self.block0 = nn.Sequential(
+            *[nn.AvgPool2d(kernel_size=3, stride=2, padding=1) for _ in range(upsample_block_num)]
+        )
         self.block1 = nn.Sequential(
-            # nn.AvgPool2d(kernel_size = 3,stride=2 ),
-            # nn.AvgPool2d(kernel_size=3, stride=2),
-            # nn.AvgPool2d(kernel_size=3, stride=2),
             nn.Conv2d(3, 64, kernel_size=9, padding=4),
             nn.PReLU()
         )
@@ -34,11 +33,8 @@ class Generator(nn.Module):
         self.block8 = nn.Sequential(*block8)
 
     def forward(self, x):
-        x = self.average(x)
-        x = self.average(x)
-        x = self.average(x)
-
-        block1 = self.block1(x)
+        downsample = self.block0(x)
+        block1 = self.block1(downsample)
         block2 = self.block2(block1)
         block3 = self.block3(block2)
         block4 = self.block4(block3)
@@ -99,10 +95,10 @@ class Discriminator(nn.Module):
 class ResidualBlock(nn.Module):
     def __init__(self, channels):
         super(ResidualBlock, self).__init__()
-        self.conv1 = nn.Conv2d(channels, channels, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(channels, channels, kernel_size=3, padding=1, bias=False)
         self.bn1 = nn.BatchNorm2d(channels)
         self.prelu = nn.PReLU()
-        self.conv2 = nn.Conv2d(channels, channels, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(channels, channels, kernel_size=3, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(channels)
 
     def forward(self, x):

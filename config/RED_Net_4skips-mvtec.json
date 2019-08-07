@@ -1,6 +1,7 @@
 {
     "model": {
         "name": "RED_Net_4skips",
+        "type": "Encoder",
         "code_dim": 256,
         "img_channel": 3,
         "fp16": false

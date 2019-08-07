@@ -1,6 +1,7 @@
 {
     "model": {
         "name": "SSIM_Net",
+        "type": "Encoder",
         "code_dim": 256,
         "img_channel": 3,
         "fp16": false
