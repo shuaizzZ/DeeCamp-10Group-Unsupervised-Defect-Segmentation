@@ -27,9 +27,7 @@ class Preproc(object):
         image = cv2.resize(image, self.resize)
         # random transformation
         p = random.uniform(0, 1)
-        if p <= 0.33:
-            image = image
-        elif (p > 0.33) and (p <= 0.66):
+        if (p > 0.33) and (p <= 0.66):
             image = mirror(image)
         else:
             image = flip(image)
@@ -107,17 +105,26 @@ class MVTEC(data.Dataset):
         else:
             return self.test_len
 
-    def eval(self, eval_dir):
+    def eval(self, eval_dir,threshold_dict):
         summary_file = open(os.path.join(eval_dir, 'summary.txt'), 'w')
         for item in self.test_dict:
             summary_file.write('--------------{}--------------\n'.format(item))
             labels = list()
             paccs = list()
             ious = list()
+            type_good_index = 0# the number of predicted good samples belonging to one of the 15 classes
+            type_bad_index = 0# the number of predicted bad samples belonging to one of the 15 classes
+            num_good = 0#the number of good samples belonging to one of the 15 classes
+            num_bad = 0#the number of bad samples belonging to one of the 15 classes
+
+            FPR_list=list()
+            TPR_list=list()
+            gt_re_list=list()
             gt_dir = os.path.join(self.root, item, 'ground_truth')
             res_dir = os.path.join(eval_dir, item, 'mask')
             log_file = open(os.path.join(eval_dir, item, 'result.txt'), 'w')
             log_file.write('Item: {}\n'.format(item))
+
             for type in os.listdir(res_dir):
                 log_file.write('--------------------------\nType: {}\n'.format(type))
                 type_dir = os.path.join(res_dir, type)
@@ -136,13 +143,20 @@ class MVTEC(data.Dataset):
                         _h, _w = gt.shape
                         mask = cv2.resize(mask, (_w, _h))
                         labels.append(0)
+
                         type_ious.append(cal_iou(mask, gt))
+                        type_bad_index+=(1-cal_good_index(mask,800))#10000
+                        gt_re_list.append(gt.reshape(_w*_h, 1))
+                        num_bad+=1
+                        #threshold_list.append(s_map)
                     else:
                         mask = cv2.imread(os.path.join(type_dir, mask))
                         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
                         _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
                         gt = np.zeros(shape=mask.shape, dtype=np.uint8)
                         labels.append(1)
+                        num_good+=(1)
+                        type_good_index+=(cal_good_index(mask, 800))#10000
                     type_paccs.append(cal_pixel_accuracy(mask, gt))
                 if type == 'good':
                     log_file.write('mean IoU: nan\n')
@@ -153,10 +167,37 @@ class MVTEC(data.Dataset):
                 paccs += type_paccs
             mIoU = np.array(ious).mean()
             mPAc = np.array(paccs).mean()
+            s_map=list()
+            for i in threshold_dict[item]:
+                a=np.array(i)
+                a=cv2.resize(a,(_w,_h))
+                #a=a.reshape(a,-1,1)
+                s_map.append(a)
+
+
+
+            s_map_all=np.array(s_map).reshape(-1,1)       
+            gt_re=np.array(gt_re_list)
+            gt_re=gt_re.reshape(-1,1)
+            for threshold in np.arange(0,1,0.005):#s_map_sort:
+                FPR_list.append(cal_FPR(s_map_all,gt_re,threshold))
+                TPR_list.append(cal_TPR(s_map_all,gt_re,threshold))
+
+            auc = cal_AUC(TPR_list, FPR_list)
+            plt.figure()
+            plt.plot(FPR_list,TPR_list,'.-')
+            plt.savefig('./eval_result/ROC_curve/'+item+'.jpg')
+            acc_good = type_good_index / num_good
+            #threshold_sample=threshold_sort[0::1000]#from the first sample to the last sample with an interval of 1000
+            acc_bad = type_bad_index / num_bad
             log_file.write('--------------------------\n')
             log_file.write('Total mean IoU:{:.2f}\n'.format(mIoU*100))
             log_file.write('Total mean Pixel Accuracy:{:.2f}\n'.format(mPAc*100))
-            summary_file.write('mIoU:{:.2f}     mPAcc:{:.2f}\n'.format(mIoU*100, mPAc*100))
+            log_file.write('AUC of defect samples: {:.2f}\n'.format(auc * 100))
+            log_file.write('acc of good samples: {:.2f}\n'.format(acc_good * 100))
+            log_file.write('acc of bad samples: {:.2f}\n'.format(acc_bad*100))
+            summary_file.write('mIoU:{:.2f}     mPAcc:{:.2f}    auc:{:.2f}  acc_good:{:.2f}  acc_bad:{:.2f}\n'.format(mIoU*100, mPAc*100,auc*100,acc_good*100,acc_bad*100))
+
             # TPR_arr, FPR_arr = cal_ROC(np.array(preds), np.array(labels))
             # AUC = cal_AUC(TPR_arr, FPR_arr)
             # log_file.write('AUC{:2f}'.format(AUC * 100))
