@@ -2,7 +2,6 @@ import os
 import json
 import argparse
 from db import training_collate
-from model.trainer import Trainer
 from tools import Timer, Log
 from factory import *
 
@@ -59,9 +58,7 @@ if __name__ == '__main__':
     print('Data set: {} has been loaded'.format(configs['db']['name']))
 
     # load model
-    net, optimizer = load_training_model_from_factory(configs)
-    loss = load_loss_from_factory(configs)
-    trainer = Trainer(net, loss, configs['op']['loss'], optimizer, ngpu=args.ngpu)
+    trainer = load_training_model_from_factory(configs, ngpu=args.ngpu)
     if configs['system']['resume']:
         trainer.load_params(configs['system']['resume_path'])
     print('Model: {} has been loaded'.format(configs['model']['name']))
@@ -96,10 +93,15 @@ if __name__ == '__main__':
         # load data
         _t.tic()
         images = next(batch_iterator)
-        # images = torch.autograd.Variable(images.cuda())
-
-        # train
-        trainer.train(images)
+        if configs['model']['type'] == 'Encoder':
+            trainer.train(images)
+        elif configs['model']['type'] == 'GAN':
+            # Update Discriminator
+            trainer.train(images, phase='discriminate')
+            # Update Generator
+            trainer.train(images, phase='generate')
+        else:
+            raise Exception("Wrong model type!")
         batch_time = _t.toc()
 
         # print message

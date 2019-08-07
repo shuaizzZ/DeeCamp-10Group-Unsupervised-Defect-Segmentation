@@ -2,33 +2,8 @@
 # -*- coding:utf-8 -*-
 # author: kristine
 # data:   2019.07.29
-
 import torch
 from torch import nn
-from model.networks.SRGAN.vgg import vgg16
-
-
-class GeneratorLoss(nn.Module):
-    def __init__(self):
-        super(GeneratorLoss, self).__init__()
-        vgg = vgg16()
-        loss_network = nn.Sequential(*list(vgg.features)[:31]).eval()
-        for param in loss_network.parameters():
-            param.requires_grad = False
-        self.loss_network = loss_network
-        self.mse_loss = nn.MSELoss()
-        self.tv_loss = TVLoss()
-
-    def forward(self, out_labels, out_images, target_images):
-        # Adversarial Loss
-        adversarial_loss = torch.mean(1 - out_labels)
-        # Perception Loss
-        perception_loss = self.mse_loss(self.loss_network(out_images), self.loss_network(target_images))
-        # Image Loss
-        image_loss = self.mse_loss(out_images, target_images)
-        # TV Loss
-        tv_loss = self.tv_loss(out_images)
-        return image_loss + 0.001 * adversarial_loss + 0.006 * perception_loss + 2e-8 * tv_loss
 
 
 class TVLoss(nn.Module):
@@ -51,6 +26,33 @@ class TVLoss(nn.Module):
         return t.size()[1] * t.size()[2] * t.size()[3]
 
 
-if __name__ == "__main__":
-    g_loss = GeneratorLoss()
-    print(g_loss)
+class GeneratorLoss(nn.Module):
+    def __init__(self, vgg16):
+        super(GeneratorLoss, self).__init__()
+        self.mse_loss = nn.MSELoss()
+        self.vgg_net = vgg16
+        self.vgg_loss = nn.MSELoss()
+        self.tv_loss = TVLoss()
+
+    def forward(self, out_labels, out_images, target_images):
+        # Adversarial Loss
+        adversarial_loss = (1 - out_labels).mean()
+        # VGG Loss
+        vgg_loss = self.vgg_loss(self.vgg_net(out_images), self.vgg_net(target_images))
+        # Image Loss
+        image_loss = self.mse_loss(out_images, target_images)
+        # TV Loss
+        tv_loss = self.tv_loss(out_images)
+
+        return image_loss, vgg_loss, adversarial_loss, tv_loss
+
+
+class DiscriminatorLoss(nn.Module):
+    def __init__(self):
+        super(DiscriminatorLoss, self).__init__()
+
+    def forward(self, real_out, fake_out):
+        # d_loss = -1 * (torch.log(real_out) + torch.log(1 - fake_out))
+        d_loss = 1 - real_out + fake_out
+
+        return d_loss.mean()

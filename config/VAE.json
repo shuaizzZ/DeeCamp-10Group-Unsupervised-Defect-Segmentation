@@ -1,6 +1,7 @@
 {
     "model": {
         "name": "VAE_Net0",
+        "type": "Encoder",
         "code_dim": 256,
         "fp16": false
     },

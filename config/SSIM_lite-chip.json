@@ -1,6 +1,7 @@
 {
     "model": {
         "name": "SSIM_Net_lite",
+        "type": "Encoder",
         "code_dim": 128,
         "img_channel": 1,
         "fp16": false

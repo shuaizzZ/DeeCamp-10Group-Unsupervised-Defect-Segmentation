@@ -1,6 +1,7 @@
 {
     "model": {
         "name": "RED_Net_2skips",
+        "type": "Encoder",
         "code_dim": 256,
         "img_channel": 1,
         "fp16": false
@@ -12,7 +13,7 @@
         "start_epoch": 0,
         "max_epoch": 200,
         "snapshot": 10,
-        "learning_rate": 4e-3,
+        "learning_rate": 1e-3,
         "decay_rate": 10,
         "epoch_steps": [90, 150, 200]
     },
@@ -22,7 +23,7 @@
         "loader_threads": 4,
         "train_split": "train",
         "val_split": "test",
-        "resize": [512, 512],
+        "resize": [768, 768],
         "batch_size": 2
     },
     "system": {
