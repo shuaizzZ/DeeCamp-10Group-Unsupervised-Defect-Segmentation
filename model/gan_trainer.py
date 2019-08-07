@@ -18,8 +18,7 @@ class Network(nn.Module):
     def forward(self, input_tensor, phase):
         if phase == 'discriminate':
             hr_img = input_tensor
-            lr_img = input_tensor
-            sr_img = self.g_net(lr_img)
+            sr_img = self.g_net(hr_img)
             real_out = self.d_net(hr_img)
             fake_out = self.d_net(sr_img)
             d_loss = self.d_loss(real_out, fake_out)
@@ -28,8 +27,7 @@ class Network(nn.Module):
 
         elif phase == 'generate':
             hr_img = input_tensor
-            lr_img = input_tensor
-            sr_img = self.g_net(lr_img)
+            sr_img = self.g_net(hr_img)
             fake_out = self.d_net(sr_img)
             image_loss, vgg_loss, adversarial_loss, tv_loss = self.g_loss(fake_out, sr_img, hr_img)
 
