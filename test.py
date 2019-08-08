@@ -12,8 +12,8 @@ from factory import *
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Object detection base on anchor.')
-    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)#--cfg VAE
-    parser.add_argument('--model_path', help="Path of model", type=str,required=True)#--model_path ./weights/VAE-final.pth
+    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)
+    parser.add_argument('--model_path', help="Path of model", type=str,required=True)
     parser.add_argument('--gpu_id', help="ID of GPU", type=int, default=0)
     parser.add_argument('--res_dir', help="Directory path of result", type=str, default='./eval_result')
     parser.add_argument('--retest', default=False, type=bool)
@@ -24,11 +24,11 @@ def parse_args():
 def test_mvtec(test_set, rebuilder, transform, save_dir):
     _t = Timer()
     cost_time = list()
-    threshold_dict=dict()
+    threshold_dict = dict()
     if not os.path.exists(os.path.join(save_dir, 'ROC_curve')):
         os.mkdir(os.path.join(save_dir, 'ROC_curve'))
     for item in test_set.test_dict:
-        threshold_list=list()
+        threshold_list = list()
         item_dict = test_set.test_dict[item]
 
         if not os.path.exists(os.path.join(save_dir, item)):
@@ -47,13 +47,14 @@ def test_mvtec(test_set, rebuilder, transform, save_dir):
             img_list = item_dict[type]
             for path in img_list:
                 image = cv2.imread(path, cv2.IMREAD_COLOR)
+                ori_h, ori_w, _ = image.shape
                 _t.tic()
                 ori_img, input_tensor = transform(image)
                 out = rebuilder.inference(input_tensor)
                 re_img = out.transpose((1, 2, 0))
-                s_map= ssim_seg(ori_img, re_img)
-                s_map=cv2.resize(s_map, (1000, 1000))
-                mask=seg_mask(s_map,threshold=64)
+                s_map = ssim_seg(ori_img, re_img)
+                s_map = cv2.resize(s_map, (ori_w, ori_h))
+                mask = seg_mask(s_map, threshold=64)
 
                 inference_time = _t.toc()
                 img_id = path.split('.')[0][-3:]
@@ -103,7 +104,8 @@ def test_chip(test_set, rebuilder, transform, save_dir):
             ori_img, input_tensor = transform(image)
             out = rebuilder.inference(input_tensor)
             re_img = out[0]
-            mask = ssim_seg(ori_img, re_img, threshold=128)
+            s_map = ssim_seg(ori_img, re_img)
+            mask = seg_mask(s_map, threshold=16)
             inference_time = _t.toc()
             cv2.imwrite(os.path.join(save_dir, type, 'ori', '{:d}.png'.format(k)), ori_img)
             cv2.imwrite(os.path.join(save_dir, type, 'gen', '{:d}.png'.format(k)), re_img)
@@ -155,7 +157,7 @@ if __name__ == '__main__':
     print('Start Testing... ')
     if configs['db']['name'] == 'mvtec':
         test_mvtec(test_set, rebuilder, transform, args.res_dir)
-    elif configs['db']['name'] == 'chip_sub':
+    elif configs['db']['name'] == 'chip':
         test_chip(test_set, rebuilder, transform, args.res_dir)
     else:
         raise Exception("Invalid set name")

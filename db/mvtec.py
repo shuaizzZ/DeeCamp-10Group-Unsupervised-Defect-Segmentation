@@ -169,12 +169,9 @@ class MVTEC(data.Dataset):
             mPAc = np.array(paccs).mean()
             s_map=list()
             for i in threshold_dict[item]:
-                a=np.array(i)
-                a=cv2.resize(a,(_w,_h))
+                a = np.array(i)
+                a = cv2.resize(a, (_w, _h))
                 s_map.append(a)
-
-
-
             s_map_all=np.array(s_map).reshape(-1,1)
             gt_re=np.array(gt_re_list)
             gt_re=gt_re.reshape(-1,1)
