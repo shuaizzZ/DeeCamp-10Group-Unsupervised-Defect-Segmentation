@@ -5,15 +5,15 @@ import argparse
 import numpy as np
 from db import Transform
 from model.rebuilder import Rebuilder
-from model.segmentation import ssim_seg
+from model.segmentation import ssim_seg, seg_mask
 from tools import Timer
 from factory import *
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Object detection base on anchor.')
-    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)
-    parser.add_argument('--model_path', help="Path of model", type=str,required=True)
+    parser.add_argument('--cfg', help="Path of config file", type=str, required=True)#--cfg VAE
+    parser.add_argument('--model_path', help="Path of model", type=str,required=True)#--model_path ./weights/VAE-final.pth
     parser.add_argument('--gpu_id', help="ID of GPU", type=int, default=0)
     parser.add_argument('--res_dir', help="Directory path of result", type=str, default='./eval_result')
     parser.add_argument('--retest', default=False, type=bool)
@@ -24,8 +24,13 @@ def parse_args():
 def test_mvtec(test_set, rebuilder, transform, save_dir):
     _t = Timer()
     cost_time = list()
+    threshold_dict=dict()
+    if not os.path.exists(os.path.join(save_dir, 'ROC_curve')):
+        os.mkdir(os.path.join(save_dir, 'ROC_curve'))
     for item in test_set.test_dict:
+        threshold_list=list()
         item_dict = test_set.test_dict[item]
+
         if not os.path.exists(os.path.join(save_dir, item)):
             os.mkdir(os.path.join(save_dir, item))
             os.mkdir(os.path.join(save_dir, item, 'ori'))
@@ -46,17 +51,27 @@ def test_mvtec(test_set, rebuilder, transform, save_dir):
                 ori_img, input_tensor = transform(image)
                 out = rebuilder.inference(input_tensor)
                 re_img = out.transpose((1, 2, 0))
-                mask = ssim_seg(ori_img, re_img)
+                s_map= ssim_seg(ori_img, re_img)
+                s_map=cv2.resize(s_map, (1000, 1000))
+                mask=seg_mask(s_map,threshold=64)
+
                 inference_time = _t.toc()
                 img_id = path.split('.')[0][-3:]
                 cv2.imwrite(os.path.join(save_dir, item, 'ori', type, '{}.png'.format(img_id)), ori_img)
                 cv2.imwrite(os.path.join(save_dir, item, 'gen', type, '{}.png'.format(img_id)), re_img)
                 cv2.imwrite(os.path.join(save_dir, item, 'mask', type, '{}.png'.format(img_id)), mask)
                 _time.append(inference_time)
+
+                if type != 'good':
+                    threshold_list.append(s_map)
+                else:
+                    pass
+
             cost_time += _time
             mean_time = np.array(_time).mean()
             print('Evaluate: Item:{}; Type:{}; Mean time:{:.1f}ms'.format(item, type, mean_time*1000))
             _t.clear()
+        threshold_dict[item] = threshold_list
     # calculate mean time
     cost_time = np.array(cost_time)
     cost_time = np.sort(cost_time)
@@ -68,7 +83,7 @@ def test_mvtec(test_set, rebuilder, transform, save_dir):
 
     # evaluate results
     print('Evaluating...')
-    test_set.eval(save_dir)
+    test_set.eval(save_dir,threshold_dict)
 
 
 def test_chip(test_set, rebuilder, transform, save_dir):
@@ -78,16 +93,21 @@ def test_chip(test_set, rebuilder, transform, save_dir):
         img_list = test_set.test_dict[type]
         if not os.path.exists(os.path.join(save_dir, type)):
             os.mkdir(os.path.join(save_dir, type))
+            os.mkdir(os.path.join(save_dir, type, 'ori'))
+            os.mkdir(os.path.join(save_dir, type, 'gen'))
+            os.mkdir(os.path.join(save_dir, type, 'mask'))
+
         for k, path in enumerate(img_list):
             image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
             _t.tic()
             ori_img, input_tensor = transform(image)
             out = rebuilder.inference(input_tensor)
             re_img = out[0]
-            mask = ssim_seg(ori_img, re_img, threshold=16)
+            mask = ssim_seg(ori_img, re_img, threshold=128)
             inference_time = _t.toc()
-            compare_img = np.concatenate((ori_img, re_img, mask), axis=1)
-            cv2.imwrite(os.path.join(save_dir, type, 'ori_gen_mask_{:d}.png'.format(k)), compare_img)
+            cv2.imwrite(os.path.join(save_dir, type, 'ori', '{:d}.png'.format(k)), ori_img)
+            cv2.imwrite(os.path.join(save_dir, type, 'gen', '{:d}.png'.format(k)), re_img)
+            cv2.imwrite(os.path.join(save_dir, type, 'mask', '{:d}.png'.format(k)), mask)
             cost_time.append(inference_time)
             if (k+1) % 20 == 0:
                 print('{}th image, cost time: {:.1f}'.format(k+1, inference_time*1000))
@@ -135,7 +155,7 @@ if __name__ == '__main__':
     print('Start Testing... ')
     if configs['db']['name'] == 'mvtec':
         test_mvtec(test_set, rebuilder, transform, args.res_dir)
-    elif configs['db']['name'] == 'chip':
+    elif configs['db']['name'] == 'chip_sub':
         test_chip(test_set, rebuilder, transform, args.res_dir)
     else:
         raise Exception("Invalid set name")
