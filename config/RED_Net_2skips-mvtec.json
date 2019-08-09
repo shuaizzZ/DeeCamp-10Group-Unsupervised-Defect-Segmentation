@@ -22,6 +22,7 @@
         "data_dir": "D:/DataSet/mvtec_anomaly_detection",
         "loader_threads": 4,
         "train_split": "train",
+        "use_validation_set": true,
         "validation_split": "validation",
         "val_split": "test",
         "resize": [256, 256],

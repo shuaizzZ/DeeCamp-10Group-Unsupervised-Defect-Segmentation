@@ -17,19 +17,34 @@ def load_params(net, path):
 
 def load_data_set_from_factory(configs, phase):
     if configs['db']['name'] == 'mvtec':
-        from db import MVTEC, MVTEC_pre
-        if phase == 'train':
-            set_name = configs['db']['train_split']
-            preproc = MVTEC_pre(resize=tuple(configs['db']['resize']))
-        elif phase == 'validation':
-            set_name = configs['db']['validation_split']
-            preproc = None
-        elif phase == 'test':
-            set_name = configs['db']['val_split']
-            preproc = None
+        from db import MVTEC, MVTEC_pre, MVTEC_with_val
+        if configs['db']['use_validation_set'] == True:
+            if phase == 'train':
+                set_name = configs['db']['train_split']
+                preproc = MVTEC_pre(resize=tuple(configs['db']['resize']))
+            elif phase == 'validation':
+                set_name = configs['db']['validation_split']
+                preproc = None
+            elif phase == 'test':
+                set_name = configs['db']['val_split']
+                preproc = None
+            else:
+                raise Exception("Invalid phase name")
+            set = MVTEC_with_val(root=configs['db']['data_dir'], set=set_name, preproc=preproc)
+        elif configs['db']['use_validation_set'] == False:
+            if phase == 'train':
+                set_name = configs['db']['train_split']
+                preproc = MVTEC_pre(resize=tuple(configs['db']['resize']))
+            elif phase == 'validation':
+                pass
+            elif phase == 'test':
+                set_name = configs['db']['val_split']
+                preproc = None
+            else:
+                raise Exception("Invalid phase name")
+            set = MVTEC(root=configs['db']['data_dir'], set=set_name, preproc=preproc)
         else:
-            raise Exception("Invalid phase name")
-        set = MVTEC(root=configs['db']['data_dir'], set=set_name, preproc=preproc)
+            raise Exception("Invalid input")
     elif configs['db']['name'] == 'chip':
         from db import CHIP, CHIP_pre
         if phase == 'train':

@@ -44,7 +44,7 @@ def val_mvtec(val_set, rebuilder, transform):
         print('validation: Item:{} finishes'.format(item))
     return threshold_seg_dict
 
-def test_mvtec(test_set, rebuilder, transform, save_dir, threshold_seg_dict):
+def test_mvtec(test_set, rebuilder, transform, save_dir, threshold_seg_dict, val_index):
     _t = Timer()
     cost_time = list()
     threshold_dict = dict()
@@ -77,7 +77,12 @@ def test_mvtec(test_set, rebuilder, transform, save_dir, threshold_seg_dict):
                 re_img = out.transpose((1, 2, 0))
                 s_map = ssim_seg(ori_img, re_img)
                 s_map = cv2.resize(s_map, (ori_w, ori_h))
-                mask = seg_mask(s_map, threshold=threshold_seg_dict[item])
+                if val_index == 1:
+                    mask = seg_mask(s_map, threshold=threshold_seg_dict[item])
+                elif val_index == 0:
+                    mask = seg_mask(s_map, threshold=threshold_seg_dict)
+                else:
+                    raise Exception("Invalid val_index")
 
                 inference_time = _t.toc()
                 img_id = path.split('.')[0][-3:]
@@ -153,9 +158,6 @@ if __name__ == '__main__':
     if not os.path.exists(args.res_dir):
         os.mkdir(args.res_dir)
 
-    # load validation set
-    val_set = load_data_set_from_factory(configs, 'validation')
-    print('Data set: {} has been loaded'.format(configs['db']['name']))
 
     # load data set
     test_set = load_data_set_from_factory(configs, 'test')
@@ -175,10 +177,19 @@ if __name__ == '__main__':
     rebuilder.load_params(args.model_path)
     print('Model: {} has been loaded'.format(configs['model']['name']))
 
-    # validation for threshold selection
-    print('Start Validation... ')
     if configs['db']['name'] == 'mvtec':
-        threshold_seg_dict = val_mvtec(val_set, rebuilder, transform)
+        if configs['db']['use_validation_set'] == True:
+            # load validation set
+            val_index = 1
+            val_set = load_data_set_from_factory(configs, 'validation')
+            print('Data set: {} has been loaded'.format(configs['db']['name']))
+            # validation for threshold selection
+            print('Start Validation... ')
+            threshold_seg_dict = val_mvtec(val_set, rebuilder, transform)
+        elif configs['db']['use_validation_set'] == False:
+            val_index = 0
+        else:
+            raise Exception("Invalid input")
     elif configs['db']['name'] == 'chip':
         pass
     else:
@@ -187,7 +198,12 @@ if __name__ == '__main__':
     # test each image
     print('Start Testing... ')
     if configs['db']['name'] == 'mvtec':
-        test_mvtec(test_set, rebuilder, transform, args.res_dir, threshold_seg_dict)
+        if configs['db']['use_validation_set'] == True:
+            test_mvtec(test_set, rebuilder, transform, args.res_dir, threshold_seg_dict, val_index)
+        elif configs['db']['use_validation_set'] == False:
+            test_mvtec(test_set, rebuilder, transform, args.res_dir, 64, val_index)
+        else:
+            raise Exception("Invalid input")
     elif configs['db']['name'] == 'chip':
         test_chip(test_set, rebuilder, transform, args.res_dir)
     else:
