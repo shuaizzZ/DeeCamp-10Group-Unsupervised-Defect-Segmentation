@@ -22,7 +22,7 @@ def ssim_seg(ori_img, re_img):
     return s_map
 
 
-def seg_mask(s_map,threshold=64):
+def seg_mask(s_map, threshold=64):
     s_map = (s_map * 255).astype("uint8")
     mask = s_map.copy()
     mask[s_map < threshold] = 255

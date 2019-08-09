@@ -29,39 +29,35 @@ def cal_pixel_accuracy(mask, gt):
     return pixel_acc
 
 
-def cal_TPR(mask,gt,threshold):
+def cal_TPR(s_map,gt,threshold):
     # True Postive Rate
-    mask_defect = (mask<threshold)
     gt_defect = (gt == 255)
-    overlap = (mask<threshold) & (gt == 255)
+    overlap = (s_map<threshold) & (gt == 255)
     gt_defect_sum = float(gt_defect.sum())
     overlap_sum = float(overlap.sum())
     TPR= overlap_sum /gt_defect_sum
     return TPR
 
 
-def cal_FPR(mask,gt,threshold):
+def cal_FPR(s_map,gt,threshold):
     # False Postive Rate
-    mask_defect = (mask<threshold)
+    mask_defect = (s_map<threshold)
     gt_good = (gt == 0)
-    overlap = (mask<threshold) & (gt == 255)
+    overlap = (s_map<threshold) & (gt == 255)
     mask_defect_sum = float(mask_defect.sum())
     gt_good_sum = float(gt_good.sum())
     overlap_sum = float(overlap.sum())
-    FPR = (mask_defect_sum-overlap_sum)/gt_good_sum#1-(overlap_sum /mask_defect_sum)
+    FPR = (mask_defect_sum-overlap_sum)/gt_good_sum
     return FPR
 
 
 def cal_AUC(TPR_arr, FPR_arr):
-    # compute the TPR_arr envelope
+    # compute AUC
     TPR_arr = np.array(TPR_arr)
     FPR_arr = np.array(FPR_arr)
-    # to calculate area under TPR curve, look for points
-    # where X axis (FPR) changes value
     AUC = 0
     for i in range(TPR_arr.size - 1):
         AUC += np.abs(FPR_arr[i+1] - FPR_arr[i]) * (TPR_arr[i+1] + TPR_arr[i]) / 2
-
     return AUC
 
 
@@ -69,10 +65,9 @@ def cal_good_index(mask,area_threshold=100):
     #compute the accuracy for good samples of each class,return 0 for bad samples, return 1 for good samples
     mask_defect = (mask == 255)
     if float(mask_defect.sum()) < area_threshold:
-        good_index = 1#good_index=0 represent good samples
+        good_index = 1
     else:
-        good_index = 0 #good_index=0 represent bad samples
-        s
+        good_index = 0
     return good_index
 
 
