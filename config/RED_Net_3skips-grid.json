@@ -22,6 +22,7 @@
         "data_dir": "D:/DataSet/chip_grid",
         "loader_threads": 4,
         "train_split": "train",
+        "validation_split": "validation",
         "val_split": "test",
         "resize": [768, 768],
         "batch_size": 32

@@ -8,6 +8,7 @@ from model.rebuilder import Rebuilder
 from model.segmentation import ssim_seg, seg_mask
 from tools import Timer
 from factory import *
+from db.eval_func import cal_good_index
 
 
 def parse_args():
@@ -20,8 +21,30 @@ def parse_args():
 
     return parser.parse_args()
 
+def val_mvtec(val_set, rebuilder, transform):
+    threshold_seg_dict = dict()
+    for item in val_set.val_dict:
+        item_list = list()
+        item_list = val_set.val_dict[item]
+        good_count = 0
+        for threshold_temp in range(0, 256):
+            for path in item_list:
+                image = cv2.imread(path, cv2.IMREAD_COLOR)
+                ori_h, ori_w, _ = image.shape
+                ori_img, input_tensor = transform(image)
+                out = rebuilder.inference(input_tensor)
+                re_img = out.transpose((1, 2, 0))
+                s_map = ssim_seg(ori_img, re_img)
+                s_map = cv2.resize(s_map, (ori_w, ori_h))
+                mask = seg_mask(s_map, threshold_temp)
+                good_count += cal_good_index(mask, 400)
+            if good_count >= int(0.99*len(item_list)):
+                threshold_seg_dict[item] = threshold_temp
+                break
+        print('validation: Item:{} finishes'.format(item))
+    return threshold_seg_dict
 
-def test_mvtec(test_set, rebuilder, transform, save_dir):
+def test_mvtec(test_set, rebuilder, transform, save_dir, threshold_seg_dict):
     _t = Timer()
     cost_time = list()
     threshold_dict = dict()
@@ -54,7 +77,7 @@ def test_mvtec(test_set, rebuilder, transform, save_dir):
                 re_img = out.transpose((1, 2, 0))
                 s_map = ssim_seg(ori_img, re_img)
                 s_map = cv2.resize(s_map, (ori_w, ori_h))
-                mask = seg_mask(s_map, threshold=64)
+                mask = seg_mask(s_map, threshold=threshold_seg_dict[item])
 
                 inference_time = _t.toc()
                 img_id = path.split('.')[0][-3:]
@@ -130,6 +153,10 @@ if __name__ == '__main__':
     if not os.path.exists(args.res_dir):
         os.mkdir(args.res_dir)
 
+    # load validation set
+    val_set = load_data_set_from_factory(configs, 'validation')
+    print('Data set: {} has been loaded'.format(configs['db']['name']))
+
     # load data set
     test_set = load_data_set_from_factory(configs, 'test')
     print('Data set: {} has been loaded'.format(configs['db']['name']))
@@ -148,10 +175,19 @@ if __name__ == '__main__':
     rebuilder.load_params(args.model_path)
     print('Model: {} has been loaded'.format(configs['model']['name']))
 
+    # validation for threshold selection
+    print('Start Validation... ')
+    if configs['db']['name'] == 'mvtec':
+        threshold_seg_dict = val_mvtec(val_set, rebuilder, transform)
+    elif configs['db']['name'] == 'chip':
+        pass
+    else:
+        raise Exception("Invalid set name")
+
     # test each image
     print('Start Testing... ')
     if configs['db']['name'] == 'mvtec':
-        test_mvtec(test_set, rebuilder, transform, args.res_dir)
+        test_mvtec(test_set, rebuilder, transform, args.res_dir, threshold_seg_dict)
     elif configs['db']['name'] == 'chip':
         test_chip(test_set, rebuilder, transform, args.res_dir)
     else:

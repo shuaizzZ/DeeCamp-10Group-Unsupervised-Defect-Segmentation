@@ -65,8 +65,33 @@ class MVTEC(data.Dataset):
                 if os.path.isfile(item_path):
                     continue
                 img_dir = os.path.join(item_path, set, 'good')
+                imag_count = 0
                 for img in os.listdir(img_dir):
-                    self.ids.append(os.path.join(img_dir, img))
+                    imag_count += 1
+                    if 1 <= imag_count <= int(0.9 * len(os.listdir(img_dir))):  # 90% data in training set for training
+                        self.ids.append(os.path.join(img_dir, img))
+                    elif imag_count > int(0.9 * len(os.listdir(img_dir))):
+                        pass
+                    else:
+                        raise Exception("Invalid image number")
+        elif set == 'validation':
+            self.val_dict = OrderedDict()
+            for _item in os.listdir(root):
+                self.ids_val = list()
+                item_path = os.path.join(root, _item)
+                if os.path.isfile(item_path):
+                    continue
+                img_dir = os.path.join(item_path, 'train', 'good')
+                imag_count = 0
+                for img in os.listdir(img_dir):
+                    imag_count += 1
+                    if 1 <= imag_count <= int(0.9 * len(os.listdir(img_dir))):
+                        pass
+                    elif imag_count > int(0.9 * len(os.listdir(img_dir))):  # 10% data in training set for validation
+                        self.ids_val.append(os.path.join(img_dir, img))
+                    else:
+                        raise Exception("Invalid image number")
+                self.val_dict[_item] = self.ids_val
         elif set == 'test':
             self.test_len = 0
             self.test_dict = OrderedDict()
@@ -145,7 +170,7 @@ class MVTEC(data.Dataset):
                         labels.append(0)
 
                         type_ious.append(cal_iou(mask, gt))
-                        type_bad_index+=(1-cal_good_index(mask,800))
+                        type_bad_index+=(1-cal_good_index(mask,400))
                         gt_re_list.append(gt.reshape(_w*_h, 1))
                         num_bad += 1
 
@@ -156,7 +181,7 @@ class MVTEC(data.Dataset):
                         gt = np.zeros(shape=mask.shape, dtype=np.uint8)
                         labels.append(1)
                         num_good += 1
-                        type_good_index += (cal_good_index(mask, 800))
+                        type_good_index += (cal_good_index(mask, 400))
                     type_paccs.append(cal_pixel_accuracy(mask, gt))
                 if type == 'good':
                     log_file.write('mean IoU: nan\n')

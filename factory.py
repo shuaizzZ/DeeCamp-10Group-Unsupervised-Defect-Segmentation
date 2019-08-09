@@ -21,6 +21,9 @@ def load_data_set_from_factory(configs, phase):
         if phase == 'train':
             set_name = configs['db']['train_split']
             preproc = MVTEC_pre(resize=tuple(configs['db']['resize']))
+        elif phase == 'validation':
+            set_name = configs['db']['validation_split']
+            preproc = None
         elif phase == 'test':
             set_name = configs['db']['val_split']
             preproc = None
