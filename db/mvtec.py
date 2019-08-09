@@ -112,14 +112,14 @@ class MVTEC(data.Dataset):
             labels = list()
             paccs = list()
             ious = list()
-            type_good_index = 0# the number of predicted good samples belonging to one of the 15 classes
-            type_bad_index = 0# the number of predicted bad samples belonging to one of the 15 classes
-            num_good = 0#the number of good samples belonging to one of the 15 classes
-            num_bad = 0#the number of bad samples belonging to one of the 15 classes
+            type_good_index = 0
+            type_bad_index = 0
+            num_good = 0
+            num_bad = 0
 
-            FPR_list=list()
-            TPR_list=list()
-            gt_re_list=list()
+            FPR_list = list()
+            TPR_list = list()
+            gt_re_list = list()
             gt_dir = os.path.join(self.root, item, 'ground_truth')
             res_dir = os.path.join(eval_dir, item, 'mask')
             log_file = open(os.path.join(eval_dir, item, 'result.txt'), 'w')
@@ -145,9 +145,9 @@ class MVTEC(data.Dataset):
                         labels.append(0)
 
                         type_ious.append(cal_iou(mask, gt))
-                        type_bad_index+=(1-cal_good_index(mask,800))#10000
+                        type_bad_index+=(1-cal_good_index(mask,800))
                         gt_re_list.append(gt.reshape(_w*_h, 1))
-                        num_bad+=1
+                        num_bad += 1
 
                     else:
                         mask = cv2.imread(os.path.join(type_dir, mask))
@@ -155,8 +155,8 @@ class MVTEC(data.Dataset):
                         _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
                         gt = np.zeros(shape=mask.shape, dtype=np.uint8)
                         labels.append(1)
-                        num_good+=(1)
-                        type_good_index+=(cal_good_index(mask, 800))#10000
+                        num_good += 1
+                        type_good_index += (cal_good_index(mask, 800))
                     type_paccs.append(cal_pixel_accuracy(mask, gt))
                 if type == 'good':
                     log_file.write('mean IoU: nan\n')
@@ -167,22 +167,17 @@ class MVTEC(data.Dataset):
                 paccs += type_paccs
             mIoU = np.array(ious).mean()
             mPAc = np.array(paccs).mean()
-            s_map=list()
-            for i in threshold_dict[item]:
-                a = np.array(i)
-                a = cv2.resize(a, (_w, _h))
-                s_map.append(a)
-            s_map_all=np.array(s_map).reshape(-1,1)
-            gt_re=np.array(gt_re_list)
-            gt_re=gt_re.reshape(-1,1)
-            for threshold in np.arange(0,1,0.005):#s_map_sort:
-                FPR_list.append(cal_FPR(s_map_all,gt_re,threshold))
-                TPR_list.append(cal_TPR(s_map_all,gt_re,threshold))
+            s_map_all = np.array(threshold_dict[item]).reshape(-1, 1)
+            gt_re = np.array(gt_re_list)
+            gt_re = gt_re.reshape(-1,1)
+            for threshold in np.arange(0,1,0.005):
+                FPR_list.append(cal_FPR(s_map_all, gt_re,threshold))
+                TPR_list.append(cal_TPR(s_map_all, gt_re,threshold))
 
             auc = cal_AUC(TPR_list, FPR_list)
             plt.figure()
-            plt.plot(FPR_list,TPR_list,'.-')
-            plt.savefig('./eval_result/ROC_curve/'+item+'.jpg')
+            plt.plot(FPR_list, TPR_list, '.-')
+            plt.savefig('./eval_result/ROC_curve/' + item + '.jpg')
             acc_good = type_good_index / num_good
             acc_bad = type_bad_index / num_bad
             log_file.write('--------------------------\n')
