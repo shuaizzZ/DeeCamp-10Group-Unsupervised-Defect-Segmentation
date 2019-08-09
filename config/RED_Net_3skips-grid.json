@@ -11,11 +11,11 @@
         "window_size":[3, 7, 15],
 
         "start_epoch": 0,
-        "max_epoch": 200,
+        "max_epoch": 100,
         "snapshot": 10,
         "learning_rate": 1e-3,
         "decay_rate": 10,
-        "epoch_steps": [90, 150, 200]
+        "epoch_steps": [60, 100]
     },
     "db": {
         "name": "chip",
