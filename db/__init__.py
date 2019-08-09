@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import torch
-from .mvtec import MVTEC
+from .mvtec import MVTEC, MVTEC_with_val
 from .mvtec import Preproc as MVTEC_pre
 from .chip import CHIP
 from .chip import Preproc as CHIP_pre
