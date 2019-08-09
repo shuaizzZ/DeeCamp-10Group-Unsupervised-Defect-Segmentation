@@ -44,6 +44,7 @@ def val_mvtec(val_set, rebuilder, transform):
         print('validation: Item:{} finishes'.format(item))
     return threshold_seg_dict
 
+
 def test_mvtec(test_set, rebuilder, transform, save_dir, threshold_seg_dict, val_index):
     _t = Timer()
     cost_time = list()
@@ -75,7 +76,7 @@ def test_mvtec(test_set, rebuilder, transform, save_dir, threshold_seg_dict, val
                 ori_img, input_tensor = transform(image)
                 out = rebuilder.inference(input_tensor)
                 re_img = out.transpose((1, 2, 0))
-                s_map = ssim_seg(ori_img, re_img)
+                s_map = ssim_seg(ori_img, re_img, win_size=11, gaussian_weights=True)
                 s_map = cv2.resize(s_map, (ori_w, ori_h))
                 if val_index == 1:
                     mask = seg_mask(s_map, threshold=threshold_seg_dict[item])
@@ -177,8 +178,10 @@ if __name__ == '__main__':
     rebuilder.load_params(args.model_path)
     print('Model: {} has been loaded'.format(configs['model']['name']))
 
+    threshold_seg_dict = {}
+    val_index = 0
     if configs['db']['name'] == 'mvtec':
-        if configs['db']['use_validation_set'] == True:
+        if configs['db']['use_validation_set'] is True:
             # load validation set
             val_index = 1
             val_set = load_data_set_from_factory(configs, 'validation')
@@ -186,7 +189,7 @@ if __name__ == '__main__':
             # validation for threshold selection
             print('Start Validation... ')
             threshold_seg_dict = val_mvtec(val_set, rebuilder, transform)
-        elif configs['db']['use_validation_set'] == False:
+        elif configs['db']['use_validation_set'] is False:
             val_index = 0
         else:
             raise Exception("Invalid input")
@@ -198,9 +201,9 @@ if __name__ == '__main__':
     # test each image
     print('Start Testing... ')
     if configs['db']['name'] == 'mvtec':
-        if configs['db']['use_validation_set'] == True:
+        if configs['db']['use_validation_set'] is True:
             test_mvtec(test_set, rebuilder, transform, args.res_dir, threshold_seg_dict, val_index)
-        elif configs['db']['use_validation_set'] == False:
+        elif configs['db']['use_validation_set'] is False:
             test_mvtec(test_set, rebuilder, transform, args.res_dir, 64, val_index)
         else:
             raise Exception("Invalid input")
